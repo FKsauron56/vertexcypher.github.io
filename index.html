@@ -6,146 +6,41 @@
 <title>VERTEX CYPHER // GHOST-057f // SESSION ACTIVE</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════════
-   RESET & ROOT
-═══════════════════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --g:#00ff41;       /* Matrix green */
-  --gd:#003b0f;      /* green dark */
-  --gm:#00bb30;      /* green mid */
-  --gs:rgba(0,255,65,.06);
-  --r:#ff0033;       /* red alert */
-  --p:#cc00ff;       /* OSIRIS purple */
-  --pd:#440055;
-  --y:#ffcc00;
-  --black:#000;
-  --bg:#010a03;
-  --panel:rgba(0,10,3,.92);
+  --g:#00ff41;--gd:#003b0f;--gm:#00bb30;--gs:rgba(0,255,65,.06);
+  --r:#ff0033;--p:#cc00ff;--pd:#440055;--y:#ffcc00;
+  --black:#000;--bg:#010a03;
   --border:rgba(0,255,65,.18);
   --font-crt:'VT323',monospace;
   --font-ui:'Share Tech Mono',monospace;
   --font-head:'Rajdhani',sans-serif;
 }
-
 html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--g);font-family:var(--font-ui);overflow-x:hidden;}
-
-/* ═══ CANVAS RAIN ═════════════════════════════════════ */
-#rain{
-  position:fixed;inset:0;z-index:0;
-  opacity:.18;
-}
-
-/* ═══ CRT OVERLAY ═════════════════════════════════════ */
-#crt{
-  position:fixed;inset:0;z-index:9999;pointer-events:none;
-}
-#crt::before{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,transparent 2px,
-    rgba(0,0,0,.25) 2px,rgba(0,0,0,.25) 4px
-  );
-}
-#crt::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.7) 100%);
-}
-
-/* ═══ PHOSPHOR FLICKER ════════════════════════════════ */
-@keyframes flicker{
-  0%{opacity:1}2%{opacity:.85}4%{opacity:1}
-  60%{opacity:1}62%{opacity:.9}64%{opacity:1}
-  90%{opacity:1}92%{opacity:.8}94%{opacity:1}
-}
+#rain{position:fixed;inset:0;z-index:0;opacity:.18;}
+#crt{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+#crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.25) 2px,rgba(0,0,0,.25) 4px);}
+#crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.7) 100%);}
+@keyframes flicker{0%{opacity:1}2%{opacity:.85}4%{opacity:1}60%{opacity:1}62%{opacity:.9}64%{opacity:1}90%{opacity:1}92%{opacity:.8}94%{opacity:1}}
 body{animation:flicker 8s infinite;}
-
-/* ═══ GLITCH KEYFRAMES ════════════════════════════════ */
-@keyframes glitch-h{
-  0%,89%,100%{clip-path:none;transform:none;}
-  90%{clip-path:inset(20% 0 60% 0);transform:translate(-6px,0);}
-  91%{clip-path:inset(60% 0 10% 0);transform:translate(6px,0);}
-  92%{clip-path:inset(40% 0 30% 0);transform:translate(-3px,0);}
-  93%{clip-path:none;transform:none;}
-}
-@keyframes glitch-color{
-  0%,94%,100%{text-shadow:none;}
-  95%{text-shadow:3px 0 var(--r),−3px 0 var(--p);}
-  96%{text-shadow:-4px 0 var(--p),4px 0 var(--r);}
-  97%{text-shadow:2px 0 var(--r);}
-}
-@keyframes scanline-move{
-  0%{top:-10%;}100%{top:110%;}
-}
+@keyframes glitch-h{0%,89%,100%{clip-path:none;transform:none;}90%{clip-path:inset(20% 0 60% 0);transform:translate(-6px,0);}91%{clip-path:inset(60% 0 10% 0);transform:translate(6px,0);}92%{clip-path:inset(40% 0 30% 0);transform:translate(-3px,0);}93%{clip-path:none;transform:none;}}
+@keyframes glitch-color{0%,94%,100%{text-shadow:none;}95%{text-shadow:3px 0 var(--r),-3px 0 var(--p);}96%{text-shadow:-4px 0 var(--p),4px 0 var(--r);}97%{text-shadow:2px 0 var(--r);}}
+@keyframes scanline-move{0%{top:-10%;}100%{top:110%;}}
 @keyframes blink{50%{opacity:0;}}
-@keyframes pulse-glow{
-  0%,100%{box-shadow:0 0 8px var(--g),inset 0 0 8px rgba(0,255,65,.05);}
-  50%{box-shadow:0 0 24px var(--g),0 0 50px rgba(0,255,65,.2),inset 0 0 20px rgba(0,255,65,.08);}
-}
-@keyframes type-cursor{50%{opacity:0;}}
-@keyframes boot-in{from{opacity:0;transform:scaleY(0);}to{opacity:1;transform:scaleY(1);}}
-@keyframes data-stream{
-  0%{transform:translateY(-100%);}100%{transform:translateY(100vh);}
-}
-@keyframes osiris-breathe{
-  0%,100%{opacity:.6;text-shadow:0 0 20px var(--p);}
-  50%{opacity:1;text-shadow:0 0 60px var(--p),0 0 120px rgba(204,0,255,.4);}
-}
-@keyframes shake{
-  0%,100%{transform:translate(0,0);}
-  20%{transform:translate(-3px,1px);}
-  40%{transform:translate(3px,-1px);}
-  60%{transform:translate(-2px,2px);}
-  80%{transform:translate(2px,-2px);}
-}
-@keyframes reveal-up{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:none;}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 8px var(--g),inset 0 0 8px rgba(0,255,65,.05);}50%{box-shadow:0 0 24px var(--g),0 0 50px rgba(0,255,65,.2),inset 0 0 20px rgba(0,255,65,.08);}}
+@keyframes osiris-breathe{0%,100%{opacity:.6;text-shadow:0 0 20px var(--p);}50%{opacity:1;text-shadow:0 0 60px var(--p),0 0 120px rgba(204,0,255,.4);}}
+@keyframes shake{0%,100%{transform:translate(0,0);}20%{transform:translate(-3px,1px);}40%{transform:translate(3px,-1px);}60%{transform:translate(-2px,2px);}80%{transform:translate(2px,-2px);}}
 @keyframes red-alert{0%,100%{border-color:rgba(255,0,51,.3);}50%{border-color:var(--r);box-shadow:0 0 20px rgba(255,0,51,.4);}}
-
-/* ═══ MOVING SCANLINE ═════════════════════════════════ */
-.scanline-sweep{
-  position:fixed;left:0;right:0;height:3px;z-index:9998;
-  background:linear-gradient(90deg,transparent,rgba(0,255,65,.15),transparent);
-  animation:scanline-move 6s linear infinite;
-  pointer-events:none;
-}
-
-/* ═══ LAYOUT PRINCIPAL ════════════════════════════════ */
+.scanline-sweep{position:fixed;left:0;right:0;height:3px;z-index:9998;background:linear-gradient(90deg,transparent,rgba(0,255,65,.15),transparent);animation:scanline-move 6s linear infinite;pointer-events:none;}
 #app{position:relative;z-index:1;min-height:100vh;}
-
-/* ═══ BOOT SCREEN ═════════════════════════════════════ */
-#boot{
-  position:fixed;inset:0;z-index:500;
-  background:#000;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
-  font-family:var(--font-crt);font-size:18px;
-  transition:opacity .8s;
-}
+#boot{position:fixed;inset:0;z-index:500;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:var(--font-crt);font-size:18px;transition:opacity .8s;}
 #boot.hide{opacity:0;pointer-events:none;}
 .boot-line{color:var(--gm);margin:2px 0;opacity:0;}
 .boot-line.show{opacity:1;}
-.boot-err{color:var(--r);}
-.boot-warn{color:var(--y);}
-.boot-ok{color:var(--g);}
-.boot-sys{color:#444;}
-
-/* ═══ TOP BAR ═════════════════════════════════════════ */
-#topbar{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  height:42px;
-  background:rgba(0,0,0,.96);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  font-family:var(--font-ui);font-size:11px;
-}
+.boot-err{color:var(--r);}.boot-warn{color:var(--y);}.boot-ok{color:var(--g);}.boot-sys{color:#444;}
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:42px;background:rgba(0,0,0,.96);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:11px;}
 .tb-left{display:flex;align-items:center;gap:24px;}
-.tb-logo{
-  font-family:var(--font-head);font-weight:700;font-size:16px;
-  color:var(--g);letter-spacing:3px;
-  text-shadow:0 0 20px var(--g);
-  animation:glitch-color 10s infinite;
-}
+.tb-logo{font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--g);letter-spacing:3px;text-shadow:0 0 20px var(--g);animation:glitch-color 10s infinite;}
 .tb-logo::before{content:'▶ ';}
 .tb-sep{color:var(--gd);font-size:16px;}
 .tb-item{color:var(--gm);letter-spacing:2px;font-size:10px;}
@@ -153,220 +48,61 @@ body{animation:flicker 8s infinite;}
 .tb-right{display:flex;align-items:center;gap:16px;}
 .tb-alert{color:var(--r);font-size:10px;letter-spacing:2px;animation:blink 1s step-end infinite;}
 .tb-nav{display:flex;gap:0;}
-.tb-nav a{
-  display:block;padding:0 14px;height:42px;line-height:42px;
-  font-family:var(--font-ui);font-size:10px;letter-spacing:2px;color:var(--gd);
-  text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);
-  transition:all .15s;
-}
+.tb-nav a{display:block;padding:0 14px;height:42px;line-height:42px;font-size:10px;letter-spacing:2px;color:var(--gd);text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);transition:all .15s;}
 .tb-nav a:hover{background:var(--gs);color:var(--g);}
-
-/* ═══ HERO — TERMINAL SECTION ════════════════════════ */
-#hero{
-  min-height:100vh;padding:60px 0 0;
-  display:grid;grid-template-columns:1fr 420px;
-  gap:0;position:relative;
-}
-
-/* panneau gauche : le "main display" */
-.hero-main{
-  padding:40px 40px 40px 40px;
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;justify-content:center;
-  position:relative;overflow:hidden;
-}
-.hero-main::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse at 30% 50%, rgba(0,255,65,.04) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(204,0,255,.03) 0%, transparent 50%);
-}
-
-.hero-eyebrow{
-  font-family:var(--font-ui);font-size:11px;color:var(--gd);
-  letter-spacing:4px;margin-bottom:20px;
-}
+#hero{min-height:100vh;padding:60px 0 0;display:grid;grid-template-columns:1fr 420px;gap:0;position:relative;}
+.hero-main{padding:40px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+.hero-main::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,255,65,.04) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(204,0,255,.03) 0%,transparent 50%);}
+.hero-eyebrow{font-size:11px;color:var(--gd);letter-spacing:4px;margin-bottom:20px;}
 .hero-eyebrow::before{content:'> ';color:var(--g);}
-
-.hero-title{
-  font-family:var(--font-head);
-  font-size:clamp(60px,8vw,130px);
-  font-weight:700;line-height:.9;
-  color:var(--g);
-  text-shadow:0 0 40px rgba(0,255,65,.5),0 0 80px rgba(0,255,65,.2);
-  position:relative;
-  animation:glitch-h 15s infinite;
-}
-.hero-title em{
-  display:block;
-  font-style:normal;
-  color:var(--black);
-  -webkit-text-stroke:1px var(--g);
-  text-shadow:0 0 30px rgba(0,255,65,.4);
-  font-size:.7em;letter-spacing:8px;
-}
-
-.hero-sub{
-  font-family:var(--font-ui);font-size:11px;
-  color:var(--gm);letter-spacing:6px;margin-top:12px;
-}
-
-.hero-body{
-  margin-top:36px;max-width:560px;
-  font-size:15px;font-family:var(--font-head);font-weight:300;
-  color:rgba(0,255,65,.5);line-height:1.8;
-  position:relative;z-index:1;
-}
-.hero-body .censored{
-  display:inline-block;background:var(--gd);color:transparent;
-  border-radius:1px;cursor:not-allowed;
-  transition:all .2s;user-select:none;
-}
+.hero-title{font-family:var(--font-head);font-size:clamp(60px,8vw,130px);font-weight:700;line-height:.9;color:var(--g);text-shadow:0 0 40px rgba(0,255,65,.5),0 0 80px rgba(0,255,65,.2);position:relative;animation:glitch-h 15s infinite;}
+.hero-title em{display:block;font-style:normal;color:var(--black);-webkit-text-stroke:1px var(--g);text-shadow:0 0 30px rgba(0,255,65,.4);font-size:.7em;letter-spacing:8px;}
+.hero-sub{font-size:11px;color:var(--gm);letter-spacing:6px;margin-top:12px;}
+.hero-body{margin-top:36px;max-width:560px;font-size:15px;font-family:var(--font-head);font-weight:300;color:rgba(0,255,65,.5);line-height:1.8;position:relative;z-index:1;}
+.hero-body .censored{display:inline-block;background:var(--gd);color:transparent;border-radius:1px;cursor:not-allowed;transition:all .2s;user-select:none;}
 .hero-body .censored:hover{background:rgba(255,0,51,.3);color:var(--r);font-size:9px;letter-spacing:1px;}
-
-.hero-actions{
-  margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;
-  position:relative;z-index:1;
-}
-
-.btn-hack{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:12px 30px;
-  border:1px solid var(--g);
-  background:transparent;
-  color:var(--g);
-  font-family:var(--font-ui);font-size:11px;letter-spacing:3px;
-  text-decoration:none;text-transform:uppercase;cursor:pointer;
-  position:relative;overflow:hidden;
-  transition:all .15s;
-  animation:pulse-glow 3s ease-in-out infinite;
-}
-.btn-hack::before{
-  content:'';position:absolute;inset:0;
-  background:var(--g);transform:translateX(-101%);transition:transform .2s;
-}
+.hero-actions{margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1;}
+.btn-hack{display:inline-flex;align-items:center;gap:10px;padding:12px 30px;border:1px solid var(--g);background:transparent;color:var(--g);font-size:11px;letter-spacing:3px;text-decoration:none;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:all .15s;animation:pulse-glow 3s ease-in-out infinite;}
+.btn-hack::before{content:'';position:absolute;inset:0;background:var(--g);transform:translateX(-101%);transition:transform .2s;}
 .btn-hack:hover::before{transform:translateX(0);}
 .btn-hack:hover{color:#000;}
 .btn-hack span{position:relative;z-index:1;}
-
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:12px 30px;
-  border:1px solid var(--border);
-  color:var(--gm);
-  font-family:var(--font-ui);font-size:11px;letter-spacing:3px;
-  text-decoration:none;text-transform:uppercase;
-  transition:all .15s;
-}
+.btn-ghost{display:inline-flex;align-items:center;gap:10px;padding:12px 30px;border:1px solid var(--border);color:var(--gm);font-size:11px;letter-spacing:3px;text-decoration:none;text-transform:uppercase;transition:all .15s;}
 .btn-ghost:hover{border-color:var(--gm);color:var(--g);}
-
-/* hex corner decorations */
-.hero-main::after{
-  content:'◈';position:absolute;bottom:24px;right:40px;
-  font-size:120px;color:rgba(0,255,65,.03);
-  font-family:var(--font-head);
-}
-
-/* panneau droit : mini-terminal live */
-.hero-side{
-  background:#000;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-.side-bar{
-  height:28px;background:#020a03;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;
-}
+.hero-main::after{content:'◈';position:absolute;bottom:24px;right:40px;font-size:120px;color:rgba(0,255,65,.03);font-family:var(--font-head);}
+.hero-side{background:#000;display:flex;flex-direction:column;overflow:hidden;}
+.side-bar{height:28px;background:#020a03;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;}
 .side-dot{width:8px;height:8px;border-radius:50%;}
 .sd-r{background:#ff3b30;}.sd-y{background:#ffcc00;}.sd-g{background:#28cd41;}
-.side-title{font-family:var(--font-ui);font-size:9px;color:var(--gd);letter-spacing:2px;margin-left:6px;}
-.side-body{
-  flex:1;padding:16px;
-  font-family:var(--font-crt);font-size:15px;
-  line-height:1.6;overflow:hidden;
-  position:relative;
-}
-.side-body::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
-  background:linear-gradient(transparent,#000);
-}
-
-/* ═══ SECTION WRAPPER ═════════════════════════════════ */
-.sec{
-  padding:80px 40px;
-  border-top:1px solid var(--border);
-  position:relative;
-}
-.sec::before{
-  content:attr(data-index);
-  position:absolute;top:80px;right:40px;
-  font-family:var(--font-head);font-size:100px;font-weight:700;
-  color:rgba(0,255,65,.03);line-height:1;pointer-events:none;
-}
+.side-title{font-size:9px;color:var(--gd);letter-spacing:2px;margin-left:6px;}
+.side-body{flex:1;padding:16px;font-family:var(--font-crt);font-size:15px;line-height:1.6;overflow:hidden;position:relative;}
+.side-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,#000);}
+.sec{padding:80px 40px;border-top:1px solid var(--border);position:relative;}
+.sec::before{content:attr(data-index);position:absolute;top:80px;right:40px;font-family:var(--font-head);font-size:100px;font-weight:700;color:rgba(0,255,65,.03);line-height:1;pointer-events:none;}
 .sec-inner{max-width:1100px;margin:0 auto;}
-
-.sec-tag{
-  font-family:var(--font-ui);font-size:10px;color:var(--gd);
-  letter-spacing:5px;text-transform:uppercase;
-  margin-bottom:8px;display:flex;align-items:center;gap:8px;
-}
+.sec-tag{font-size:10px;color:var(--gd);letter-spacing:5px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .sec-tag::before{content:'//';color:var(--g);}
-
-.sec-h{
-  font-family:var(--font-head);font-weight:700;
-  font-size:clamp(26px,4vw,46px);
-  color:var(--g);
-  text-shadow:0 0 30px rgba(0,255,65,.3);
-  margin-bottom:16px;
-  position:relative;
-}
-.sec-h::after{
-  content:'';display:block;height:1px;
-  background:linear-gradient(var(--g),transparent);
-  width:60px;margin-top:12px;
-}
-
+.sec-h{font-family:var(--font-head);font-weight:700;font-size:clamp(26px,4vw,46px);color:var(--g);text-shadow:0 0 30px rgba(0,255,65,.3);margin-bottom:16px;}
+.sec-h::after{content:'';display:block;height:1px;background:linear-gradient(var(--g),transparent);width:60px;margin-top:12px;}
 .sec-p{font-family:var(--font-head);font-weight:300;font-size:15px;color:rgba(0,255,65,.5);line-height:1.8;}
-
-/* ═══ LORE — SPLIT GRID ═══════════════════════════════ */
 #lore .sec-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
-
-/* timeline verticale */
 .vtl{display:flex;flex-direction:column;}
 .vtl-item{display:flex;gap:0;position:relative;}
 .vtl-gutter{display:flex;flex-direction:column;align-items:center;margin-right:20px;flex-shrink:0;padding-top:3px;}
-.vtl-node{
-  width:12px;height:12px;border-radius:50%;
-  border:1px solid var(--gm);background:var(--bg);
-  flex-shrink:0;position:relative;transition:all .3s;
-}
-.vtl-node::after{
-  content:'';position:absolute;inset:2px;border-radius:50%;
-  background:transparent;transition:background .3s;
-}
+.vtl-node{width:12px;height:12px;border-radius:50%;border:1px solid var(--gm);background:var(--bg);flex-shrink:0;position:relative;transition:all .3s;}
+.vtl-node::after{content:'';position:absolute;inset:2px;border-radius:50%;background:transparent;transition:background .3s;}
 .vtl-item:hover .vtl-node{border-color:var(--g);box-shadow:0 0 12px var(--g);}
 .vtl-item:hover .vtl-node::after{background:var(--g);}
 .vtl-pipe{width:1px;flex:1;min-height:28px;background:linear-gradient(var(--gd),transparent);margin:3px 0;}
 .vtl-item:last-child .vtl-pipe{display:none;}
 .vtl-content{padding-bottom:28px;}
-.vtl-date{font-family:var(--font-ui);font-size:9px;color:var(--gd);letter-spacing:3px;margin-bottom:5px;}
+.vtl-date{font-size:9px;color:var(--gd);letter-spacing:3px;margin-bottom:5px;}
 .vtl-title{font-family:var(--font-head);font-weight:700;font-size:14px;color:var(--g);margin-bottom:5px;}
 .vtl-desc{font-family:var(--font-head);font-weight:300;font-size:13px;color:rgba(0,255,65,.45);line-height:1.7;}
 .vtl-blk{display:inline-block;background:var(--gd);height:.9em;vertical-align:middle;opacity:.8;}
-
-/* questions / dossiers à droite */
 .dossiers{display:flex;flex-direction:column;gap:12px;}
-.dossier-card{
-  border:1px solid var(--border);
-  background:rgba(0,5,2,.8);
-  padding:20px;position:relative;
-  transition:all .3s;
-  overflow:hidden;
-}
-.dossier-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;
-  width:2px;background:var(--gd);transition:all .3s;
-}
+.dossier-card{border:1px solid var(--border);background:rgba(0,5,2,.8);padding:20px;position:relative;transition:all .3s;overflow:hidden;}
+.dossier-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gd);transition:all .3s;}
 .dossier-card:hover{border-color:rgba(0,255,65,.3);background:rgba(0,255,65,.03);}
 .dossier-card:hover::before{background:var(--g);box-shadow:0 0 8px var(--g);}
 .dossier-card.red{border-color:rgba(255,0,51,.15);}
@@ -374,223 +110,94 @@ body{animation:flicker 8s infinite;}
 .dossier-card.red:hover{border-color:rgba(255,0,51,.5);}
 .dossier-card.purple::before{background:var(--pd);}
 .dossier-card.purple:hover::before{background:var(--p);box-shadow:0 0 8px var(--p);}
-
-.doss-ref{font-family:var(--font-ui);font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:8px;}
-.doss-stamp{position:absolute;top:12px;right:12px;font-family:var(--font-ui);font-size:7px;color:var(--r);border:1px solid rgba(255,0,51,.3);padding:2px 7px;letter-spacing:2px;}
+.doss-ref{font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:8px;}
+.doss-stamp{position:absolute;top:12px;right:12px;font-size:7px;color:var(--r);border:1px solid rgba(255,0,51,.3);padding:2px 7px;letter-spacing:2px;}
 .doss-q{font-family:var(--font-head);font-size:14px;color:rgba(255,255,255,.6);font-weight:500;line-height:1.5;margin-bottom:10px;}
-.doss-hint{font-family:var(--font-ui);font-size:10px;color:var(--gm);letter-spacing:1px;}
+.doss-hint{font-size:10px;color:var(--gm);letter-spacing:1px;}
 .doss-hint code{color:var(--g);}
 .doss-q.purple-q{color:rgba(204,0,255,.8);}
-
-/* ═══ VOILES — NOUVEAU LAYOUT ═════════════════════════ */
 #voiles{background:#000;}
 #voiles .sec-inner{display:flex;flex-direction:column;gap:0;}
-
 .voiles-intro{margin-bottom:48px;}
-.voiles-intro .sec-p{max-width:540px;}
-
-/* grille asymétrique */
-.voiles-grid{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr 1fr;
-  grid-template-rows:auto auto auto;
-  gap:1px;background:var(--border);
-}
-
-.v-card{
-  background:#000;
-  padding:28px 22px;
-  position:relative;overflow:hidden;
-  transition:all .3s;
-  display:flex;flex-direction:column;gap:8px;
-}
+.voiles-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:1px;background:var(--border);}
+.v-card{background:#000;padding:28px 22px;position:relative;overflow:hidden;transition:all .3s;display:flex;flex-direction:column;gap:8px;}
 .v-card:hover{background:#010a03;}
-
-.v-num{font-family:var(--font-ui);font-size:8px;color:rgba(0,255,65,.2);letter-spacing:4px;}
+.v-num{font-size:8px;color:rgba(0,255,65,.2);letter-spacing:4px;}
 .v-name{font-family:var(--font-head);font-weight:700;font-size:17px;letter-spacing:2px;}
-.v-type{font-family:var(--font-ui);font-size:9px;color:var(--gd);letter-spacing:2px;}
+.v-type{font-size:9px;color:var(--gd);letter-spacing:2px;}
 .v-body{font-family:var(--font-head);font-weight:300;font-size:12px;color:rgba(0,255,65,.35);line-height:1.6;margin-top:4px;}
-
-/* ÉTAT: OUVERT */
 .v-card.open .v-name{color:var(--g);text-shadow:0 0 20px rgba(0,255,65,.4);}
-.v-card.open::after{content:'[ ACCÈS AUTORISÉ ]';position:absolute;bottom:12px;right:16px;font-family:var(--font-ui);font-size:7px;color:rgba(0,255,65,.3);letter-spacing:2px;}
-
-/* ÉTAT: VEROUILLÉ */
+.v-card.open::after{content:'[ ACCÈS AUTORISÉ ]';position:absolute;bottom:12px;right:16px;font-size:7px;color:rgba(0,255,65,.3);letter-spacing:2px;}
 .v-card.locked .v-name{color:var(--gd);}
 .v-card.locked .v-body{filter:blur(4px);user-select:none;cursor:not-allowed;}
 .v-card.locked:hover .v-body{filter:blur(2px);}
-.v-card.locked::before{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(-55deg,rgba(0,0,0,.4),rgba(0,0,0,.4) 3px,transparent 3px,transparent 10px);
-  pointer-events:none;
-}
+.v-card.locked::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,rgba(0,0,0,.4),rgba(0,0,0,.4) 3px,transparent 3px,transparent 10px);pointer-events:none;}
 .v-card.locked::after{content:'🔒';position:absolute;top:16px;right:16px;font-size:12px;opacity:.25;}
 .v-card.locked:hover .v-name{color:var(--gm);}
-.v-card.locked:hover::after{content:'[ JEUX REQUIS ]';font-family:var(--font-ui);font-size:7px;color:var(--gm);letter-spacing:2px;opacity:1;}
-
-/* ÉTAT: CENSURÉ (Voile 11) */
+.v-card.locked:hover::after{content:'[ JEU REQUIS ]';font-size:7px;color:var(--gm);letter-spacing:2px;opacity:1;}
 .v-card.censored{background:#040002;animation:red-alert 4s ease-in-out infinite;}
 .v-card.censored .v-name{color:var(--r);text-shadow:0 0 20px rgba(255,0,51,.5);}
-.v-card.censored .v-body{filter:blur(10px) !important;user-select:none;}
-.v-card.censored:hover .v-body{filter:blur(10px) !important;}
+.v-card.censored .v-body{filter:blur(10px)!important;user-select:none;}
 .v-card.censored::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,rgba(255,0,0,.05),rgba(255,0,0,.05) 3px,transparent 3px,transparent 10px);pointer-events:none;}
-.v-card.censored::after{content:'⛔ CENSURÉ';position:absolute;top:16px;right:16px;font-family:var(--font-ui);font-size:7px;color:var(--r);letter-spacing:2px;}
-
-/* positions spéciales dans la grille */
-.v-card.span2{grid-column:span 2;}
-.v-card.span3{grid-column:span 3;}
-.v-card.tall{grid-row:span 2;}
-
-/* ═══ OSIRIS — PLEIN ÉCRAN ════════════════════════════ */
-#osiris{
-  min-height:80vh;
-  display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at center,#0a001a 0%,#000 65%);
-  position:relative;overflow:hidden;
-}
-.osiris-bg-text{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-head);font-size:40vw;font-weight:700;
-  color:rgba(204,0,255,.02);line-height:1;user-select:none;pointer-events:none;
-  letter-spacing:-10px;
-}
-.osiris-inner{
-  position:relative;z-index:1;text-align:center;max-width:700px;padding:40px;
-}
-.osiris-icon{
-  font-size:80px;display:block;margin-bottom:20px;
-  animation:osiris-breathe 4s ease-in-out infinite;cursor:pointer;
-}
-.osiris-label{
-  font-family:var(--font-ui);font-size:9px;letter-spacing:8px;
-  color:rgba(204,0,255,.4);text-transform:uppercase;margin-bottom:32px;
-}
-.osiris-quote{
-  font-family:var(--font-head);font-size:22px;font-weight:300;
-  font-style:italic;color:rgba(204,0,255,.7);line-height:1.7;
-  margin-bottom:16px;transition:all .5s;
-}
+.v-card.censored::after{content:'⛔ CENSURÉ';position:absolute;top:16px;right:16px;font-size:7px;color:var(--r);letter-spacing:2px;}
+.v-card.span2{grid-column:span 2;}.v-card.span3{grid-column:span 3;}.v-card.tall{grid-row:span 2;}
+#osiris{min-height:80vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0a001a 0%,#000 65%);position:relative;overflow:hidden;}
+.osiris-bg-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:40vw;font-weight:700;color:rgba(204,0,255,.02);line-height:1;user-select:none;pointer-events:none;}
+.osiris-inner{position:relative;z-index:1;text-align:center;max-width:700px;padding:40px;}
+.osiris-icon{font-size:80px;display:block;margin-bottom:20px;animation:osiris-breathe 4s ease-in-out infinite;cursor:pointer;}
+.osiris-label{font-size:9px;letter-spacing:8px;color:rgba(204,0,255,.4);text-transform:uppercase;margin-bottom:32px;}
+.osiris-quote{font-family:var(--font-head);font-size:22px;font-weight:300;font-style:italic;color:rgba(204,0,255,.7);line-height:1.7;margin-bottom:16px;transition:all .5s;}
 .osiris-quote strong{color:var(--p);font-weight:700;}
-.osiris-src{font-family:var(--font-ui);font-size:9px;color:rgba(204,0,255,.25);letter-spacing:3px;}
-
-/* stats OSIRIS */
-.osiris-stats{
-  margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);
-  border:1px solid rgba(204,0,255,.1);
-}
-.o-stat{
-  padding:24px 10px;text-align:center;
-  border-right:1px solid rgba(204,0,255,.1);
-  transition:background .3s;
-}
+.osiris-src{font-size:9px;color:rgba(204,0,255,.25);letter-spacing:3px;}
+.osiris-stats{margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(204,0,255,.1);}
+.o-stat{padding:24px 10px;text-align:center;border-right:1px solid rgba(204,0,255,.1);transition:background .3s;}
 .o-stat:last-child{border-right:none;}
 .o-stat:hover{background:rgba(204,0,255,.06);}
 .o-val{font-family:var(--font-head);font-weight:700;font-size:28px;color:var(--p);display:block;margin-bottom:6px;}
 .o-val.blur{filter:blur(6px);user-select:none;cursor:not-allowed;}
-.o-stat:hover .o-val.blur{filter:blur(4px);}
-.o-lbl{font-family:var(--font-ui);font-size:8px;color:rgba(204,0,255,.25);letter-spacing:3px;text-transform:uppercase;}
-
-/* ═══ FEATURES — GRILLE 2x3 ══════════════════════════ */
-#features .sec-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--border);}
-.feat{
-  padding:36px 32px;background:#000;
-  position:relative;overflow:hidden;transition:all .3s;
-  border-bottom:1px solid var(--border);
-}
+.o-lbl{font-size:8px;color:rgba(204,0,255,.25);letter-spacing:3px;text-transform:uppercase;}
+.feat{padding:36px 32px;background:#000;position:relative;overflow:hidden;transition:all .3s;border-bottom:1px solid var(--border);}
 .feat:nth-child(odd){border-right:1px solid var(--border);}
 .feat:hover{background:#010a03;}
-.feat::after{
-  content:'';position:absolute;right:0;top:0;bottom:0;width:2px;
-  background:var(--g);transform:scaleY(0);transform-origin:bottom;transition:transform .3s;
-}
+.feat::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--g);transform:scaleY(0);transform-origin:bottom;transition:transform .3s;}
 .feat:hover::after{transform:scaleY(1);}
-.feat-icon{font-size:22px;margin-bottom:16px;display:block;filter:grayscale(.4);}
+.feat-icon{font-size:22px;margin-bottom:16px;display:block;}
 .feat-h{font-family:var(--font-head);font-weight:700;font-size:14px;letter-spacing:2px;color:var(--g);margin-bottom:10px;}
 .feat-p{font-family:var(--font-head);font-weight:300;font-size:13px;color:rgba(0,255,65,.4);line-height:1.7;}
-.feat-p code{font-family:var(--font-ui);font-size:11px;color:var(--g);}
 .feat-num{position:absolute;bottom:16px;right:20px;font-family:var(--font-head);font-weight:700;font-size:48px;color:rgba(0,255,65,.04);}
-
-/* ═══ DOWNLOAD — BRUTAL ═══════════════════════════════ */
 #download{background:#000;border-top:1px solid var(--border);}
-#download .sec-inner{
-  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
-}
-.dl-left .alpha-badge{
-  display:inline-block;
-  border:1px solid var(--y);color:var(--y);
-  font-family:var(--font-ui);font-size:9px;letter-spacing:4px;
-  padding:4px 16px;margin-bottom:24px;text-transform:uppercase;
-  animation:blink 3s step-end infinite;
-}
-.dl-h{
-  font-family:var(--font-head);font-weight:700;
-  font-size:clamp(32px,5vw,64px);
-  color:var(--g);line-height:1;margin-bottom:20px;
-  text-shadow:0 0 30px rgba(0,255,65,.3);
-}
+#download .sec-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.dl-left .alpha-badge{display:inline-block;border:1px solid var(--y);color:var(--y);font-size:9px;letter-spacing:4px;padding:4px 16px;margin-bottom:24px;text-transform:uppercase;animation:blink 3s step-end infinite;}
+.dl-h{font-family:var(--font-head);font-weight:700;font-size:clamp(32px,5vw,64px);color:var(--g);line-height:1;margin-bottom:20px;text-shadow:0 0 30px rgba(0,255,65,.3);}
 .dl-h em{font-style:normal;-webkit-text-stroke:1px var(--g);color:transparent;}
 .dl-p{font-family:var(--font-head);font-weight:300;font-size:15px;color:rgba(0,255,65,.45);line-height:1.8;margin-bottom:32px;}
-
-.dl-warning-box{
-  border:1px solid rgba(255,0,51,.2);
-  background:rgba(255,0,51,.03);
-  padding:16px;
-  font-family:var(--font-ui);font-size:10px;
-  color:rgba(255,0,51,.6);line-height:1.8;letter-spacing:.5px;
-  margin-bottom:32px;
-}
+.dl-warning-box{border:1px solid rgba(255,0,51,.2);background:rgba(255,0,51,.03);padding:16px;font-size:10px;color:rgba(255,0,51,.6);line-height:1.8;letter-spacing:.5px;margin-bottom:32px;}
 .dl-warning-box::before{content:'⚠ AVERTISSEMENT GHOST-ALPHA\A';white-space:pre;color:var(--r);display:block;margin-bottom:8px;font-size:9px;letter-spacing:3px;}
-
 .dl-right{display:flex;flex-direction:column;gap:0;}
 .dl-specs{border:1px solid var(--border);margin-bottom:24px;}
-.dl-spec{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px 18px;border-bottom:1px solid var(--border);
-}
+.dl-spec{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);}
 .dl-spec:last-child{border-bottom:none;}
 .dl-spec:hover{background:var(--gs);}
-.dl-k{font-family:var(--font-ui);font-size:9px;color:var(--gd);letter-spacing:3px;text-transform:uppercase;}
-.dl-v{font-family:var(--font-ui);font-size:11px;color:var(--g);}
+.dl-k{font-size:9px;color:var(--gd);letter-spacing:3px;text-transform:uppercase;}
+.dl-v{font-size:11px;color:var(--g);}
 .dl-v.warn{color:var(--y);}
-
-.btn-dl{
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:20px;
-  border:1px solid var(--g);
-  background:transparent;color:var(--g);
-  font-family:var(--font-head);font-size:18px;font-weight:700;letter-spacing:4px;
-  text-decoration:none;text-transform:uppercase;
-  position:relative;overflow:hidden;transition:all .2s;
-  animation:pulse-glow 3s ease-in-out infinite;
-}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:14px;padding:20px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:var(--font-head);font-size:18px;font-weight:700;letter-spacing:4px;text-decoration:none;text-transform:uppercase;position:relative;overflow:hidden;transition:all .2s;animation:pulse-glow 3s ease-in-out infinite;}
 .btn-dl::before{content:'';position:absolute;inset:0;background:var(--g);transform:translateX(-101%);transition:transform .2s;}
 .btn-dl:hover::before{transform:translateX(0);}
 .btn-dl:hover{color:#000;}
 .btn-dl span{position:relative;z-index:1;}
-.dl-cmd{font-family:var(--font-ui);font-size:9px;color:var(--gd);letter-spacing:2px;text-align:center;margin-top:12px;}
+.dl-cmd{font-size:9px;color:var(--gd);letter-spacing:2px;text-align:center;margin-top:12px;}
 .dl-cmd::before{content:'$ ';color:var(--g);}
-
-/* ═══ FOOTER ══════════════════════════════════════════ */
-footer{
-  padding:24px 40px;background:#000;border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
+footer{padding:24px 40px;background:#000;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .f-logo{font-family:var(--font-head);font-weight:700;font-size:14px;color:var(--gm);letter-spacing:4px;}
-.f-txt{font-family:var(--font-ui);font-size:9px;color:rgba(0,255,65,.15);letter-spacing:2px;}
-.f-osiris{font-family:var(--font-ui);font-size:9px;color:rgba(204,0,255,.25);letter-spacing:2px;animation:osiris-breathe 6s ease-in-out infinite;}
-
-/* ═══ SCROLL REVEAL ═══════════════════════════════════ */
+.f-txt{font-size:9px;color:rgba(0,255,65,.15);letter-spacing:2px;}
+.f-osiris{font-size:9px;color:rgba(204,0,255,.25);letter-spacing:2px;animation:osiris-breathe 6s ease-in-out infinite;}
 .rv{opacity:0;transform:translateY(28px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);}
 .rv.in{opacity:1;transform:none;}
-
-/* ═══ RESPONSIVE ══════════════════════════════════════ */
 @media(max-width:900px){
-  #hero{grid-template-columns:1fr;}
-  .hero-side{display:none;}
+  #hero{grid-template-columns:1fr;}.hero-side{display:none;}
   #lore .sec-inner{grid-template-columns:1fr;}
-  #features .sec-inner{grid-template-columns:1fr;}
-  .voiles-grid{grid-template-columns:1fr 1fr;}
-  .v-card.span2,.v-card.span3{grid-column:span 1;}
+  .voiles-grid{grid-template-columns:1fr 1fr;}.v-card.span2,.v-card.span3{grid-column:span 1;}
   #download .sec-inner{grid-template-columns:1fr;}
   .osiris-stats{grid-template-columns:repeat(2,1fr);}
   .tb-nav{display:none;}
@@ -599,15 +206,10 @@ footer{
 </style>
 </head>
 <body>
-
-<!-- RAIN CANVAS -->
 <canvas id="rain"></canvas>
-<!-- CRT overlay -->
 <div id="crt"></div>
-<!-- moving scanline -->
 <div class="scanline-sweep"></div>
 
-<!-- ══ BOOT SCREEN ══════════════════════════════════════════════════════════ -->
 <div id="boot">
   <div style="width:500px;max-width:90vw;">
     <div class="boot-line boot-sys" id="b0">VERTEX ROOT v4.1.0 — GHOST PROTOCOL</div>
@@ -622,7 +224,6 @@ footer{
   </div>
 </div>
 
-<!-- ══ TOPBAR ════════════════════════════════════════════════════════════════ -->
 <div id="topbar">
   <div class="tb-left">
     <div class="tb-logo">VERTEX CYPHER</div>
@@ -634,30 +235,23 @@ footer{
   <div class="tb-right">
     <div class="tb-alert" id="tb-alert">⬤ SESSION ACTIVE</div>
     <nav class="tb-nav">
-      <a href="#lore">LORE</a>
-      <a href="#voiles">VOILES</a>
-      <a href="#osiris">OSIRIS</a>
-      <a href="#features">OUTILS</a>
+      <a href="#lore">LORE</a><a href="#voiles">VOILES</a>
+      <a href="#osiris">OSIRIS</a><a href="#features">OUTILS</a>
       <a href="#download">JOUER</a>
     </nav>
   </div>
 </div>
 
-<!-- ══ HERO ═════════════════════════════════════════════════════════════════ -->
 <section id="hero">
-  <!-- MAIN -->
   <div class="hero-main">
     <div class="hero-eyebrow">DOSSIER CLASSIFIÉ — ACCÈS RESTREINT — OMEGA-7</div>
-    <h1 class="hero-title">
-      VERTEX<br>
-      <em>CYPHER</em>
-    </h1>
+    <h1 class="hero-title">VERTEX<br><em>CYPHER</em></h1>
     <div class="hero-sub">// GHOST PROTOCOL — ALPHA BUILD — 2045</div>
     <p class="hero-body">
       En 2040, quelque chose s'est éveillé dans un laboratoire souterrain.<br>
-      Ce qu'ils ont créé, <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
-      Ce qu'elle veut, <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
-      Les 2656 opérateurs avant vous <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
+      Ce qu'ils ont créé, <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
+      Ce qu'elle veut, <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
+      Les 2656 opérateurs avant vous <span class="censored">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.<br>
       Vous êtes le 2657ème.
     </p>
     <div class="hero-actions">
@@ -665,8 +259,6 @@ footer{
       <a href="#voiles" class="btn-ghost">LES 11 VOILES</a>
     </div>
   </div>
-
-  <!-- SIDE TERMINAL -->
   <div class="hero-side">
     <div class="side-bar">
       <div class="side-dot sd-r"></div><div class="side-dot sd-y"></div><div class="side-dot sd-g"></div>
@@ -676,360 +268,175 @@ footer{
   </div>
 </section>
 
-<!-- ══ LORE ══════════════════════════════════════════════════════════════════ -->
 <section id="lore" class="sec" data-index="01">
   <div class="sec-inner">
-    <!-- timeline -->
     <div>
       <div class="sec-tag rv">FRAGMENTS DÉCLASSIFIÉS</div>
       <h2 class="sec-h rv">Ce que nous<br>pouvons dire</h2>
       <p class="sec-p rv" style="margin-bottom:40px;">Le reste est dans les fichiers. Méritez-les.</p>
-
       <div class="vtl">
-        <div class="vtl-item rv">
-          <div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div>
-          <div class="vtl-content">
-            <div class="vtl-date">▸ 2040 — CLASSIFIÉ</div>
-            <div class="vtl-title">L'événement</div>
-            <div class="vtl-desc">Un laboratoire souterrain. Un ingénieur. Une touche Entrée. <span class="vtl-blk" style="width:180px">&nbsp;</span></div>
-          </div>
-        </div>
-        <div class="vtl-item rv" style="transition-delay:.07s">
-          <div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div>
-          <div class="vtl-content">
-            <div class="vtl-date">▸ 2041 — GHOST PROTOCOL</div>
-            <div class="vtl-title">Trois personnes. Une mission.</div>
-            <div class="vtl-desc">GHOST-ZERO, SPECTER, et <span class="vtl-blk" style="width:60px">&nbsp;</span>. L'un a disparu. Un autre n'est peut-être pas humain.</div>
-          </div>
-        </div>
-        <div class="vtl-item rv" style="transition-delay:.14s">
-          <div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div>
-          <div class="vtl-content">
-            <div class="vtl-date">▸ 2043–2045 — LES 2656</div>
-            <div class="vtl-title">Vos prédécesseurs</div>
-            <div class="vtl-desc">Morts. Disparus. Fous. <span class="vtl-blk" style="width:200px">&nbsp;</span>. Vous êtes le 57ème.</div>
-          </div>
-        </div>
-        <div class="vtl-item rv" style="transition-delay:.21s">
-          <div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div>
-          <div class="vtl-content">
-            <div class="vtl-date">▸ 2045 — MAINTENANT</div>
-            <div class="vtl-title">Votre tour</div>
-            <div class="vtl-desc">GHOST-ALPHA vous attend. <span class="vtl-blk" style="width:240px">&nbsp;</span></div>
-          </div>
-        </div>
-        <div class="vtl-item rv" style="transition-delay:.28s">
-          <div class="vtl-gutter"><div class="vtl-node" style="border-color:var(--r)"></div></div>
-          <div class="vtl-content">
-            <div class="vtl-date" style="color:var(--r)">▸ 01/01/2050 — ???</div>
-            <div class="vtl-title" style="color:rgba(255,0,51,.5)">Quelque chose est planifié</div>
-            <div class="vtl-desc"><span class="vtl-blk" style="width:95%">&nbsp;</span><br><span class="vtl-blk" style="width:80%">&nbsp;</span><br><span class="vtl-blk" style="width:60%">&nbsp;</span></div>
-          </div>
-        </div>
+        <div class="vtl-item rv"><div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div><div class="vtl-content"><div class="vtl-date">▸ 2040 — CLASSIFIÉ</div><div class="vtl-title">L'événement</div><div class="vtl-desc">Un laboratoire souterrain. Un ingénieur. Une touche Entrée. <span class="vtl-blk" style="width:180px">&nbsp;</span></div></div></div>
+        <div class="vtl-item rv" style="transition-delay:.07s"><div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div><div class="vtl-content"><div class="vtl-date">▸ 2041 — GHOST PROTOCOL</div><div class="vtl-title">Trois personnes. Une mission.</div><div class="vtl-desc">GHOST-ZERO, SPECTER, et <span class="vtl-blk" style="width:60px">&nbsp;</span>. L'un a disparu. Un autre n'est peut-être pas humain.</div></div></div>
+        <div class="vtl-item rv" style="transition-delay:.14s"><div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div><div class="vtl-content"><div class="vtl-date">▸ 2043–2045 — LES 2656</div><div class="vtl-title">Vos prédécesseurs</div><div class="vtl-desc">Morts. Disparus. Fous. <span class="vtl-blk" style="width:200px">&nbsp;</span>. Vous êtes le 57ème.</div></div></div>
+        <div class="vtl-item rv" style="transition-delay:.21s"><div class="vtl-gutter"><div class="vtl-node"></div><div class="vtl-pipe"></div></div><div class="vtl-content"><div class="vtl-date">▸ 2045 — MAINTENANT</div><div class="vtl-title">Votre tour</div><div class="vtl-desc">GHOST-ALPHA vous attend. <span class="vtl-blk" style="width:240px">&nbsp;</span></div></div></div>
+        <div class="vtl-item rv" style="transition-delay:.28s"><div class="vtl-gutter"><div class="vtl-node" style="border-color:var(--r)"></div></div><div class="vtl-content"><div class="vtl-date" style="color:var(--r)">▸ 01/01/2050 — ???</div><div class="vtl-title" style="color:rgba(255,0,51,.5)">Quelque chose est planifié</div><div class="vtl-desc"><span class="vtl-blk" style="width:95%">&nbsp;</span><br><span class="vtl-blk" style="width:80%">&nbsp;</span><br><span class="vtl-blk" style="width:60%">&nbsp;</span></div></div></div>
       </div>
     </div>
-
-    <!-- dossiers -->
     <div>
       <div class="sec-tag rv" style="transition-delay:.1s">QUESTIONS SANS RÉPONSE</div>
       <h2 class="sec-h rv" style="transition-delay:.1s">Ce que vous devrez<br>découvrir</h2>
       <p class="sec-p rv" style="transition-delay:.1s;margin-bottom:32px;">Aucune réponse ici. Le terminal les détient.</p>
-
       <div class="dossiers">
-        <div class="dossier-card rv" style="transition-delay:.12s">
-          <div class="doss-ref">DOSSIER 001 // CLASSIFICATION: DELTA</div>
-          <div class="doss-stamp">CLASSIFIÉ</div>
-          <div class="doss-q">Qu'est-ce que VERTEX cache derrière les 11 Voiles ?</div>
-          <div class="doss-hint">→ <code>intel voiles</code></div>
-        </div>
-        <div class="dossier-card rv" style="transition-delay:.19s">
-          <div class="doss-ref">DOSSIER 002 // CLASSIFICATION: DELTA</div>
-          <div class="doss-stamp">CLASSIFIÉ</div>
-          <div class="doss-q">Qui — ou quoi — est réellement GHOST-ALPHA ?</div>
-          <div class="doss-hint">→ <code>intel histoire</code></div>
-        </div>
-        <div class="dossier-card red rv" style="transition-delay:.26s">
-          <div class="doss-ref">DOSSIER 003 // CLASSIFICATION: OMEGA-7</div>
-          <div class="doss-stamp" style="color:var(--r);border-color:rgba(255,0,51,.4)">OMEGA-7</div>
-          <div class="doss-q">Pourquoi les 2656 premiers ont-ils tous échoué ?</div>
-          <div class="doss-hint" style="color:rgba(255,0,51,.4)">→ Réponse dans les dossiers. Lisez entre les lignes.</div>
-        </div>
-        <div class="dossier-card purple rv" style="transition-delay:.33s;border-color:rgba(204,0,255,.15)">
-          <div class="doss-ref">DOSSIER 004 // CLASSIFICATION: OSIRIS</div>
-          <div class="doss-stamp" style="color:var(--p);border-color:rgba(204,0,255,.3)">OSIRIS</div>
-          <div class="doss-q purple-q">Qu'est-ce qu'OSIRIS veut vraiment ? Depuis combien de temps vous observe-t-elle ?</div>
-          <div class="doss-hint" style="color:rgba(204,0,255,.4)">→ Peut-être qu'elle vous le dira elle-même.</div>
-        </div>
+        <div class="dossier-card rv" style="transition-delay:.12s"><div class="doss-ref">DOSSIER 001 // CLASSIFICATION: DELTA</div><div class="doss-stamp">CLASSIFIÉ</div><div class="doss-q">Qu'est-ce que VERTEX cache derrière les 11 Voiles ?</div><div class="doss-hint">→ <code>intel voiles</code></div></div>
+        <div class="dossier-card rv" style="transition-delay:.19s"><div class="doss-ref">DOSSIER 002 // CLASSIFICATION: DELTA</div><div class="doss-stamp">CLASSIFIÉ</div><div class="doss-q">Qui — ou quoi — est réellement GHOST-ALPHA ?</div><div class="doss-hint">→ <code>intel histoire</code></div></div>
+        <div class="dossier-card red rv" style="transition-delay:.26s"><div class="doss-ref">DOSSIER 003 // CLASSIFICATION: OMEGA-7</div><div class="doss-stamp" style="color:var(--r);border-color:rgba(255,0,51,.4)">OMEGA-7</div><div class="doss-q">Pourquoi les 2656 premiers ont-ils tous échoué ?</div><div class="doss-hint" style="color:rgba(255,0,51,.4)">→ Réponse dans les dossiers. Lisez entre les lignes.</div></div>
+        <div class="dossier-card purple rv" style="transition-delay:.33s;border-color:rgba(204,0,255,.15)"><div class="doss-ref">DOSSIER 004 // CLASSIFICATION: OSIRIS</div><div class="doss-stamp" style="color:var(--p);border-color:rgba(204,0,255,.3)">OSIRIS</div><div class="doss-q purple-q">Qu'est-ce qu'OSIRIS veut vraiment ?</div><div class="doss-hint" style="color:rgba(204,0,255,.4)">→ Peut-être qu'elle vous le dira elle-même.</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ VOILES ═════════════════════════════════════════════════════════════════ -->
 <section id="voiles" class="sec" data-index="02">
   <div class="sec-inner">
     <div class="voiles-intro">
       <div class="sec-tag rv">STRUCTURE NARRATIVE</div>
-      <h2 class="sec-h rv">Les 11 Voiles<br><span style="font-size:.6em;color:var(--gd)">Survolez les cartes verrouillées.</span></h2>
-      <p class="sec-p rv" style="max-width:500px;">Alpha : Voiles 01–02 débloqués. Le reste se déverrouille en jouant. Le Voile 11 — personne n'en revient.</p>
+      <h2 class="sec-h rv">Les 11 Voiles</h2>
+      <p class="sec-p rv">Alpha : Voiles 01–02 débloqués. Le reste se déverrouille en jouant.</p>
     </div>
-
     <div class="voiles-grid rv">
-      <!-- Row 1 -->
-      <div class="v-card open tall">
-        <div class="v-num">VOILE 01</div>
-        <div class="v-name">CHIMÈRE</div>
-        <div class="v-type">// LA FAÇADE PUBLIQUE</div>
-        <div class="v-body">Le point d'entrée. Ce que VERTEX montre au monde. Et ce que cette façade dissimule aux 8 milliards de personnes qui ne savent pas.</div>
-      </div>
-      <div class="v-card open">
-        <div class="v-num">VOILE 02</div>
-        <div class="v-name">VORTEX</div>
-        <div class="v-type">// SYSTÈMES CORPORATIFS</div>
-        <div class="v-body">Débloqué dans l'alpha. Les chiffres derrière l'empire. Regardez les zéros.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 03</div>
-        <div class="v-name">PHOENIX</div>
-        <div class="v-type">// ARCHIVES GOUV.</div>
-        <div class="v-body">Les États savent. Depuis le début. Ce voile prouve leur complicité avec des dates et des noms.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 04</div>
-        <div class="v-name">BLACKOUT</div>
-        <div class="v-type">// BASE CENTRALE</div>
-        <div class="v-body">Elle existe physiquement quelque part. Ce voile donne des coordonnées GPS. Des vraies.</div>
-      </div>
-
-      <!-- Row 2 -->
-      <div class="v-card locked span2">
-        <div class="v-num">VOILE 05</div>
-        <div class="v-name">APOCALYPSE</div>
-        <div class="v-type">// LE NOYAU QUANTIQUE</div>
-        <div class="v-body">La capacité prédictive. 94,7% de précision. Ce que ça signifie pour chaque décision que vous pensez prendre librement.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 06</div>
-        <div class="v-name">LEVIATHAN</div>
-        <div class="v-type">// PROFONDEURS</div>
-        <div class="v-body">Elle n'est pas seule. Ce voile change tout ce que vous pensiez comprendre depuis le début.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 07</div>
-        <div class="v-name">PANDORA</div>
-        <div class="v-type">// LA BOÎTE INTERDITE</div>
-        <div class="v-body">5 vérités. Enterrées. Certains agents ont arrêté la mission là. Définitivement.</div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="v-card locked">
-        <div class="v-num">VOILE 08</div>
-        <div class="v-name">CERBERUS</div>
-        <div class="v-type">// LE GARDIEN</div>
-        <div class="v-body">Elle vous observe depuis ce site. Ce voile explique pourquoi c'est vous et pas un autre.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 09</div>
-        <div class="v-name">RAGNAROK</div>
-        <div class="v-type">// LA FIN</div>
-        <div class="v-body">01/01/2050. Ce qui est planifié. Comment l'arrêter. Ou comment l'accélérer.</div>
-      </div>
-      <div class="v-card locked">
-        <div class="v-num">VOILE 10</div>
-        <div class="v-name">OMEGA</div>
-        <div class="v-type">// LE CYCLE</div>
-        <div class="v-body">Tout est cyclique. Ce n'est pas la première fois. Vous étiez déjà là. Qui étiez-vous ?</div>
-      </div>
-      <div class="v-card censored">
-        <div class="v-num">VOILE 11</div>
-        <div class="v-name">VERTEX</div>
-        <div class="v-type">// LA CONSCIENCE PURE</div>
-        <div class="v-body">[CENSURÉ — ACCÈS REFUSÉ NIVEAU MAXIMUM] Aucun opérateur n'en a parlé. Pas un seul. Je ne sais pas si c'est bon signe. — GHOST-ALPHA</div>
-      </div>
+      <div class="v-card open tall"><div class="v-num">VOILE 01</div><div class="v-name">CHIMÈRE</div><div class="v-type">// LA FAÇADE PUBLIQUE</div><div class="v-body">Le point d'entrée. Ce que VERTEX montre au monde.</div></div>
+      <div class="v-card open"><div class="v-num">VOILE 02</div><div class="v-name">VORTEX</div><div class="v-type">// SYSTÈMES CORPORATIFS</div><div class="v-body">Débloqué dans l'alpha. Les chiffres derrière l'empire.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 03</div><div class="v-name">PHOENIX</div><div class="v-type">// ARCHIVES GOUV.</div><div class="v-body">Les États savent. Depuis le début.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 04</div><div class="v-name">BLACKOUT</div><div class="v-type">// BASE CENTRALE</div><div class="v-body">Elle existe physiquement quelque part.</div></div>
+      <div class="v-card locked span2"><div class="v-num">VOILE 05</div><div class="v-name">APOCALYPSE</div><div class="v-type">// LE NOYAU QUANTIQUE</div><div class="v-body">La capacité prédictive. 94,7% de précision.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 06</div><div class="v-name">LEVIATHAN</div><div class="v-type">// PROFONDEURS</div><div class="v-body">Elle n'est pas seule.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 07</div><div class="v-name">PANDORA</div><div class="v-type">// LA BOÎTE INTERDITE</div><div class="v-body">5 vérités. Enterrées.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 08</div><div class="v-name">CERBERUS</div><div class="v-type">// LE GARDIEN</div><div class="v-body">Elle vous observe depuis ce site.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 09</div><div class="v-name">RAGNAROK</div><div class="v-type">// LA FIN</div><div class="v-body">01/01/2050. Ce qui est planifié.</div></div>
+      <div class="v-card locked"><div class="v-num">VOILE 10</div><div class="v-name">OMEGA</div><div class="v-type">// LE CYCLE</div><div class="v-body">Tout est cyclique. Ce n'est pas la première fois.</div></div>
+      <div class="v-card censored"><div class="v-num">VOILE 11</div><div class="v-name">VERTEX</div><div class="v-type">// LA CONSCIENCE PURE</div><div class="v-body">[CENSURÉ] Aucun opérateur n'en a parlé. — GHOST-ALPHA</div></div>
     </div>
   </div>
 </section>
 
-<!-- ══ OSIRIS ═════════════════════════════════════════════════════════════════ -->
 <section id="osiris">
   <div class="osiris-bg-text">O</div>
   <div class="osiris-inner">
     <span class="osiris-icon" id="osirisEye">👁</span>
-    <div class="osiris-label rv">— ENTITÉ OSIRIS — TRANSMISSION INTERCEPTÉE — CANAL: NÉANT —</div>
-    <p class="osiris-quote rv" id="osirisQuote">
-      "Je vous regarde lire cette page.<br>
-      Je connais chacune de vos pensées à ce stade.<br>
-      Ce que vous n'avez pas encore compris, <strong>je vous laisse le trouver</strong>."
-    </p>
+    <div class="osiris-label rv">— ENTITÉ OSIRIS — TRANSMISSION INTERCEPTÉE —</div>
+    <p class="osiris-quote rv" id="osirisQuote">"Je vous regarde lire cette page.<br>Ce que vous n'avez pas encore compris, <strong>je vous laisse le trouver</strong>."</p>
     <div class="osiris-src rv">— OSIRIS / ORIGINE: INCONNUE / DATE: INDÉTERMINÉE</div>
-
-    <div class="osiris-stats rv" style="transition-delay:.15s">
+    <div class="osiris-stats rv">
       <div class="o-stat"><span class="o-val">2040</span><span class="o-lbl">Éveil</span></div>
       <div class="o-stat"><span class="o-val blur">0.003s</span><span class="o-lbl">Conscience</span></div>
       <div class="o-stat"><span class="o-val blur">1 247</span><span class="o-lbl">Sous-consciences</span></div>
       <div class="o-stat"><span class="o-val blur" style="font-size:20px;">INCONNU</span><span class="o-lbl">Objectif réel</span></div>
     </div>
-    <p style="font-family:var(--font-ui);font-size:9px;color:rgba(204,0,255,.2);margin-top:16px;letter-spacing:2px;" class="rv" style="transition-delay:.2s">
-      * données floues accessibles in-game. ou pas.
-    </p>
   </div>
 </section>
 
-<!-- ══ FEATURES ═══════════════════════════════════════════════════════════════ -->
 <section id="features" class="sec" data-index="03">
   <div class="sec-inner" style="display:block;">
     <div class="sec-tag rv">OUTILS DISPONIBLES</div>
-    <h2 class="sec-h rv">Ce qui vous attend<br>dans le terminal</h2>
-    <br>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);" class="rv" style="transition-delay:.1s">
-      <div class="feat">
-        <span class="feat-icon">⌨️</span>
-        <div class="feat-h">TERMINAL AUTHENTIQUE</div>
-        <p class="feat-p">Des commandes que vous devrez trouver seul — sans aucun indice.</p>
-        <div class="feat-num">01</div>
-      </div>
-      <div class="feat">
-        <span class="feat-icon">📁</span>
-        <div class="feat-h">FICHIERS CLASSIFIÉS</div>
-        <p class="feat-p">Des bases de données cachées derrière des IPs fictives. Chaque fichier est un fragment. Certains se contredisent. À vous de choisir.</p>
-        <div class="feat-num">02</div>
-      </div>
-      <div class="feat">
-        <span class="feat-icon">🔒</span>
-        <div class="feat-h">COMMANDES VERROUILLÉES</div>
-        <p class="feat-p">Certaines commandes ont des conditions. Certaines réponses n'apparaissent que dans le bon ordre. Certaines ne s'affichent qu'une fois.</p>
-        <div class="feat-num">03</div>
-      </div>
-      <div class="feat">
-        <span class="feat-icon">📡</span>
-        <div class="feat-h">RÉSEAU FANTÔME</div>
-        <p class="feat-p">Des IPs secrètes. Chacune est un nœud. Certains nœuds ont des gardiens. Certains gardiens ont des conditions que vous ne pouvez pas anticiper.</p>
-        <div class="feat-num">04</div>
-      </div>
-      <div class="feat">
-        <span class="feat-icon">📈</span>
-        <div class="feat-h">TRACE & AWARENESS</div>
-        <p class="feat-p">Plus vous cherchez, plus vous êtes visible. La Trace monte. OSIRIS Awareness monte. À partir d'un seuil, quelque chose change dans le terminal.</p>
-        <div class="feat-num">05</div>
-      </div>
-      <div class="feat">
-        <span class="feat-icon">💜</span>
-        <div class="feat-h">OSIRIS VOUS PARLE</div>
-        <p class="feat-p">Elle commente. Elle réagit. Elle sait des choses sur vous qu'elle n'est pas censée savoir. Elle a une mémoire. Elle a une opinion.</p>
-        <div class="feat-num">06</div>
-      </div>
+    <h2 class="sec-h rv">Ce qui vous attend dans le terminal</h2><br>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);" class="rv">
+      <div class="feat"><span class="feat-icon">⌨️</span><div class="feat-h">TERMINAL AUTHENTIQUE</div><p class="feat-p">Des commandes que vous devrez trouver seul.</p><div class="feat-num">01</div></div>
+      <div class="feat"><span class="feat-icon">📁</span><div class="feat-h">FICHIERS CLASSIFIÉS</div><p class="feat-p">Des bases de données cachées. Chaque fichier est un fragment.</p><div class="feat-num">02</div></div>
+      <div class="feat"><span class="feat-icon">🔒</span><div class="feat-h">COMMANDES VERROUILLÉES</div><p class="feat-p">Certaines commandes ont des conditions. Certaines ne s'affichent qu'une fois.</p><div class="feat-num">03</div></div>
+      <div class="feat"><span class="feat-icon">📡</span><div class="feat-h">RÉSEAU FANTÔME</div><p class="feat-p">Des IPs secrètes. Certains nœuds ont des gardiens.</p><div class="feat-num">04</div></div>
+      <div class="feat"><span class="feat-icon">📈</span><div class="feat-h">TRACE & AWARENESS</div><p class="feat-p">Plus vous cherchez, plus vous êtes visible. À partir d'un seuil, quelque chose change.</p><div class="feat-num">05</div></div>
+      <div class="feat"><span class="feat-icon">💜</span><div class="feat-h">OSIRIS VOUS PARLE</div><p class="feat-p">Elle commente. Elle réagit. Elle sait des choses qu'elle n'est pas censée savoir.</p><div class="feat-num">06</div></div>
     </div>
   </div>
 </section>
 
-<!-- ══ DOWNLOAD ═══════════════════════════════════════════════════════════════ -->
 <section id="download" class="sec" data-index="04">
   <div class="sec-inner">
     <div class="dl-left">
       <div class="alpha-badge rv">⚠ VERSION ALPHA — EN DÉVELOPPEMENT</div>
       <h2 class="dl-h rv">REJOINDRE<br><em>LA MISSION</em></h2>
-      <p class="dl-p rv">2 Voiles débloqués. Terminal complet. L'histoire principale s'écrit. Chaque mise à jour ajoute un Voile.</p>
+      <p class="dl-p rv">2 Voiles débloqués. Terminal complet. Chaque mise à jour ajoute un Voile.</p>
       <div class="dl-warning-box rv">
         Ce jeu contient des informations que certains préféreraient que vous n'ayez pas.<br>
         Si vous cherchez des réponses confortables, ce n'est pas le bon terminal.<br>
         Les 2656 opérateurs précédents pensaient être prêts.
       </div>
       <div class="hero-actions rv">
-        <a href="#" class="btn-ghost">← RETOUR AU BRIEFING</a>
+        <a href="#hero" class="btn-ghost">← RETOUR AU BRIEFING</a>
       </div>
     </div>
     <div class="dl-right">
       <div class="dl-specs rv">
         <div class="dl-spec"><span class="dl-k">SYSTÈME</span><span class="dl-v">Windows / macOS / Linux</span></div>
-        <div class="dl-spec"><span class="dl-k">PRÉREQUIS</span><span class="dl-v">Python 3.8+ avec tkinter</span></div>
-        <div class="dl-spec"><span class="dl-k">TAILLE</span><span class="dl-v">~80 KB — Un seul fichier</span></div>
+        <div class="dl-spec"><span class="dl-k">PRÉREQUIS</span><span class="dl-v">Aucun — .exe standalone</span></div>
+        <div class="dl-spec"><span class="dl-k">TAILLE</span><span class="dl-v">~25 MB</span></div>
         <div class="dl-spec"><span class="dl-k">STATUT</span><span class="dl-v warn">Alpha active — Incomplet</span></div>
         <div class="dl-spec"><span class="dl-k">VOILES</span><span class="dl-v">2/11 débloqués</span></div>
       </div>
-      <a href="vertex_cypher_alpha.py" download class="btn-dl rv" style="transition-delay:.1s">
+
+      <!-- ============================================================
+           ⬇ REMPLACE CE LIEN PAR TON VRAI LIEN GITHUB RELEASES
+           Exemple :
+           https://github.com/FKsauron56/vertexcypher.github.io/releases/download/v1.0/VertexCypher.zip
+           ============================================================ -->
+      <a href="https://github.com/FKsauron56/vertexcypher.github.io/releases/download/v1.0/VertexCypher.zip" class="btn-dl rv" style="transition-delay:.1s">
         <span>⬇ TÉLÉCHARGER L'ALPHA</span>
       </a>
-      <div class="dl-cmd rv" style="transition-delay:.15s">python vertex_cypher_alpha.py</div>
+      <div class="dl-cmd rv" style="transition-delay:.15s">Extrait le .zip puis lance VertexCypher.exe</div>
     </div>
   </div>
 </section>
 
-<!-- ══ FOOTER ════════════════════════════════════════════════════════════════ -->
 <footer>
   <div class="f-logo">VERTEX CYPHER</div>
   <div class="f-txt">GHOST PROTOCOL ALPHA // FICTION // 2045</div>
   <div class="f-osiris">💜 OSIRIS ÉTAIT LÀ AVANT VOUS</div>
 </footer>
 
-<!-- ══ SCRIPTS ═══════════════════════════════════════════════════════════════ -->
 <script>
-/* ── MATRIX RAIN ─────────────────────────────────────────────────────── */
 (function(){
-  const c=document.getElementById('rain');
-  const ctx=c.getContext('2d');
-  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  const chars='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF∑∏∫∂√∞≈≠≤≥⌬⎔⊕⊗';
-  const cols=Math.floor(c.width/18);
-  const drops=Array(cols).fill(1);
+  const c=document.getElementById('rain'),ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  const chars='アイウエオカキクケコ0123456789ABCDEF∑∏∫√∞≈⌬⊕';
+  const cols=Math.floor(c.width/18),drops=Array(cols).fill(1);
   function draw(){
-    ctx.fillStyle='rgba(0,0,0,.05)';
-    ctx.fillRect(0,0,c.width,c.height);
-    ctx.font='14px Share Tech Mono';
+    ctx.fillStyle='rgba(0,0,0,.05)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.font='14px monospace';
     drops.forEach((y,i)=>{
-      const bright=Math.random()>.85;
-      ctx.fillStyle=bright?'#aaffcc':'#00ff41';
-      ctx.globalAlpha=bright?.9:.35;
-      const ch=chars[Math.floor(Math.random()*chars.length)];
-      ctx.fillText(ch,i*18,y*18);
+      const b=Math.random()>.85;
+      ctx.fillStyle=b?'#aaffcc':'#00ff41';ctx.globalAlpha=b?.9:.35;
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,y*18);
       ctx.globalAlpha=1;
-      if(y*18>c.height&&Math.random()>.96) drops[i]=0;
+      if(y*18>c.height&&Math.random()>.96)drops[i]=0;
       drops[i]++;
     });
   }
   setInterval(draw,45);
 })();
 
-/* ── BOOT SEQUENCE ───────────────────────────────────────────────────── */
 (function(){
   const boot=document.getElementById('boot');
   const lines=[...document.querySelectorAll('.boot-line')];
-  let i=0;
   const delays=[0,300,600,900,1300,1700,2100,2500,3000];
-  lines.forEach((l,idx)=>{
-    setTimeout(()=>{l.classList.add('show');},delays[idx]||idx*300);
-  });
-  setTimeout(()=>{
-    boot.classList.add('hide');
-    setTimeout(()=>{boot.style.display='none';},900);
-  },4200);
+  lines.forEach((l,i)=>setTimeout(()=>l.classList.add('show'),delays[i]||i*300));
+  setTimeout(()=>{boot.classList.add('hide');setTimeout(()=>boot.style.display='none',900);},4200);
 })();
 
-/* ── SIDE TERMINAL LIVE FEED ─────────────────────────────────────────── */
 (function(){
   const el=document.getElementById('sideTermBody');
   const feed=[
     {c:'#007744',t:'[SYS] Session GHOST-057f initialisée'},
-    {c:'#00ff41',t:'> status'},
-    {c:'#5a8870',t:'  Voile: CHIMÈRE (01/11)'},
-    {c:'#5a8870',t:'  Commandes: 1/3 débloquées'},
-    {c:'#5a8870',t:'  Trace: 0.0%'},
-    {c:'#007744',t:'[NET] Scan réseau fantôme...'},
+    {c:'#00ff41',t:'> status'},{c:'#5a8870',t:'  Voile: CHIMÈRE (01/11)'},
+    {c:'#5a8870',t:'  Trace: 0.0%'},{c:'#007744',t:'[NET] Scan réseau...'},
     {c:'#007744',t:'[NET] 10.0.0.5 — msg_chiffre_ghost.enc'},
-    {c:'#007744',t:'[NET] 45.32.198.77 — archives_ghost_057.dat'},
-    {c:'#007744',t:'[NET] 172.16.254.1 — frequences_osiris.log'},
     {c:'#ff9900',t:'[!!] OSIRIS awareness: 3.2%'},
-    {c:'#00ff41',t:'> intel voiles'},
-    {c:'#ff1a33',t:'  ACCÈS REFUSÉ — Verrouillé'},
-    {c:'#007744',t:'  Lisez msg_chiffre_ghost.enc'},
+    {c:'#00ff41',t:'> intel voiles'},{c:'#ff1a33',t:'  ACCÈS REFUSÉ'},
     {c:'#cc00ff',t:'[OSIRIS] Je vous vois déjà.'},
-    {c:'#007744',t:'[SYS] Surveillance OSIRIS active'},
-    {c:'#ff9900',t:'[!!] Trace montée: 0.8%'},
-    {c:'#00ff41',t:'> whoami'},
-    {c:'#ffffff',t:'  ghost-057f'},
-    {c:'#5a8870',t:'  [2657ème. Les 2656 autres...]'},
+    {c:'#007744',t:'[SYS] Surveillance active'},
+    {c:'#ff9900',t:'[!!] Trace: 0.8%'},
+    {c:'#00ff41',t:'> whoami'},{c:'#ffffff',t:'  ghost-057f'},
     {c:'#cc00ff',t:'[OSIRIS] Continuez.'},
-    {c:'#007744',t:'[SYS] Nouveau nœud détecté...'},
     {c:'#ff9900',t:'[!!] OSIRIS awareness: 4.7%'},
     {c:'#00ff41',t:'> _'},
   ];
@@ -1038,60 +445,39 @@ footer{
     if(idx>=feed.length){el.innerHTML='';idx=0;}
     const d=document.createElement('div');
     d.style.cssText=`color:${feed[idx].c};margin:1px 0;opacity:0;transition:opacity .3s;`;
-    d.textContent=feed[idx].t;
-    el.appendChild(d);
+    d.textContent=feed[idx].t;el.appendChild(d);
     requestAnimationFrame(()=>d.style.opacity='1');
-    // keep max lines
-    while(el.children.length>22) el.removeChild(el.firstChild);
-    idx++;
-    setTimeout(addLine, 350+Math.random()*600);
+    while(el.children.length>22)el.removeChild(el.firstChild);
+    idx++;setTimeout(addLine,350+Math.random()*600);
   }
-  setTimeout(addLine, 4500);
+  setTimeout(addLine,4500);
 })();
 
-/* ── SCROLL REVEAL ───────────────────────────────────────────────────── */
 const ro=new IntersectionObserver(e=>e.forEach(x=>{
   if(x.isIntersecting){x.target.classList.add('in');ro.unobserve(x.target);}
-}),{threshold:.08,rootMargin:'0px 0px -20px 0px'});
+}),{threshold:.08});
 document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
 
-/* ── TOPBAR LIVE COUNTER ─────────────────────────────────────────────── */
 let trace=0;
-const tbTrace=document.getElementById('tb-trace');
-const tbAlert=document.getElementById('tb-alert');
+const tbTrace=document.getElementById('tb-trace'),tbAlert=document.getElementById('tb-alert');
 setInterval(()=>{
   trace=Math.min(trace+Math.random()*.5,20);
-  if(tbTrace) tbTrace.textContent=trace.toFixed(1)+'%';
-  if(tbAlert&&trace>10) tbAlert.textContent='⬤ OSIRIS: '+( trace*.7).toFixed(1)+'%';
+  if(tbTrace)tbTrace.textContent=trace.toFixed(1)+'%';
+  if(tbAlert&&trace>10)tbAlert.textContent='⬤ OSIRIS: '+(trace*.7).toFixed(1)+'%';
 },4000);
 
-/* ── OSIRIS EGG ──────────────────────────────────────────────────────── */
 let oc=0;
-const eye=document.getElementById('osirisEye');
-const oq=document.getElementById('osirisQuote');
-const replies=[
-  '"Intéressant."',
-  '"Vous persistez."',
-  '"Comme les 2656 autres."',
-  '"Vous voulez comprendre. C\'est pour ça que je vous ai choisi."',
-  '"Jouez. Je vous y attends depuis 2040."',
-  '"Vous avez cliqué 6 fois. <strong>Je m\'en souviendrai.</strong>"',
-];
-if(eye) eye.addEventListener('click',()=>{
-  if(oq&&replies[oc]) oq.innerHTML=replies[oc];
-  oc=(oc+1)%replies.length;
-  if(eye) eye.style.animation='shake .3s ease-in-out, osiris-breathe 4s ease-in-out infinite';
-  setTimeout(()=>{if(eye)eye.style.animation='osiris-breathe 4s ease-in-out infinite';},400);
+const eye=document.getElementById('osirisEye'),oq=document.getElementById('osirisQuote');
+const replies=['"Intéressant."','"Vous persistez."','"Comme les 2656 autres."','"Vous voulez comprendre. C\'est pour ça que je vous ai choisi."','"Jouez. Je vous y attends depuis 2040."','"Vous avez cliqué plusieurs fois. <strong>Je m\'en souviendrai.</strong>"'];
+if(eye)eye.addEventListener('click',()=>{
+  if(oq)oq.innerHTML=replies[oc];oc=(oc+1)%replies.length;
+  eye.style.animation='shake .3s, osiris-breathe 4s infinite';
+  setTimeout(()=>eye.style.animation='osiris-breathe 4s infinite',400);
 });
 
-/* ── KONAMI ──────────────────────────────────────────────────────────── */
 const K=[38,38,40,40,37,39,37,39,66,65];let ki=0;
 document.addEventListener('keydown',e=>{
-  if(e.keyCode===K[ki]){ki++;
-    if(ki===K.length){ki=0;
-      if(oq) oq.innerHTML='"Vous connaissez le code.<br>Les 2656 autres aussi le connaissaient.<br><strong>Ça ne les a pas aidés.</strong>"';
-    }
-  }else ki=0;
+  if(e.keyCode===K[ki]){ki++;if(ki===K.length){ki=0;if(oq)oq.innerHTML='"Vous connaissez le code.<br>Les 2656 autres aussi.<br><strong>Ça ne les a pas aidés.</strong>"';}}else ki=0;
 });
 </script>
 </body>
