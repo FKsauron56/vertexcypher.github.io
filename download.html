@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERTEX CYPHER // TÉLÉCHARGEMENT // GHOST PROTOCOL</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --g:#00ff41;--gd:#003b0f;--gm:#00bb30;--gs:rgba(0,255,65,.06);
+  --r:#ff0033;--p:#cc00ff;--y:#ffcc00;
+  --black:#000;--bg:#010a03;
+  --border:rgba(0,255,65,.18);
+  --font-crt:'VT323',monospace;
+  --font-ui:'Share Tech Mono',monospace;
+  --font-head:'Rajdhani',sans-serif;
+}
+html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--g);font-family:var(--font-ui);overflow-x:hidden;}
+#rain{position:fixed;inset:0;z-index:0;opacity:.13;}
+#crt{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+#crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.25) 2px,rgba(0,0,0,.25) 4px);}
+#crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.7) 100%);}
+.scanline{position:fixed;left:0;right:0;height:3px;z-index:9998;background:linear-gradient(90deg,transparent,rgba(0,255,65,.15),transparent);animation:scan 6s linear infinite;pointer-events:none;}
+@keyframes scan{0%{top:-5%;}100%{top:105%;}}
+@keyframes blink{50%{opacity:0;}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 8px var(--g),inset 0 0 8px rgba(0,255,65,.05);}50%{box-shadow:0 0 24px var(--g),0 0 50px rgba(0,255,65,.2),inset 0 0 20px rgba(0,255,65,.08);}}
+@keyframes flicker{0%{opacity:1}2%{opacity:.85}4%{opacity:1}60%{opacity:1}62%{opacity:.9}64%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:none;}}
+body{animation:flicker 8s infinite;}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:42px;background:rgba(0,0,0,.96);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:11px;}
+.tb-logo{font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--g);letter-spacing:3px;text-shadow:0 0 20px var(--g);}
+.tb-logo::before{content:'▶ ';}
+.tb-nav a{padding:0 14px;height:42px;line-height:42px;font-size:10px;letter-spacing:2px;color:var(--gd);text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);transition:all .15s;display:inline-block;}
+.tb-nav a:hover{background:var(--gs);color:var(--g);}
+.tb-back{color:var(--gm);font-size:10px;letter-spacing:2px;text-decoration:none;transition:color .15s;}
+.tb-back:hover{color:var(--g);}
+.tb-back::before{content:'← ';}
+
+/* HERO */
+#app{position:relative;z-index:1;padding-top:42px;}
+.page-hero{padding:80px 40px 60px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,255,65,.04),transparent 60%);}
+.ph-tag{font-size:10px;color:var(--gd);letter-spacing:5px;margin-bottom:16px;animation:fadeUp .6s ease both;}
+.ph-tag::before{content:'// ';}
+.ph-h{font-family:var(--font-head);font-weight:700;font-size:clamp(50px,7vw,110px);line-height:.9;color:var(--g);text-shadow:0 0 40px rgba(0,255,65,.4);animation:fadeUp .6s .1s ease both;}
+.ph-h em{display:block;font-style:normal;color:transparent;-webkit-text-stroke:1px var(--g);font-size:.65em;letter-spacing:8px;}
+.ph-sub{font-size:12px;color:rgba(0,255,65,.4);letter-spacing:4px;margin-top:16px;animation:fadeUp .6s .2s ease both;}
+.ph-badge{display:inline-block;border:1px solid var(--y);color:var(--y);font-size:9px;letter-spacing:4px;padding:4px 16px;margin-top:20px;animation:blink 3s step-end infinite,fadeUp .6s .3s ease both;}
+
+/* PLATFORMS */
+.platforms{padding:80px 40px;max-width:1100px;margin:0 auto;}
+.plat-title{font-size:10px;color:var(--gd);letter-spacing:5px;margin-bottom:48px;}
+.plat-title::before{content:'// ';}
+.plat-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+@media(max-width:700px){.plat-grid{grid-template-columns:1fr;}}
+
+/* PLATFORM CARD */
+.plat-card{border:1px solid var(--border);background:rgba(0,5,2,.9);padding:40px;position:relative;overflow:hidden;transition:all .3s;animation:fadeUp .6s ease both;}
+.plat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gd);transition:all .3s;}
+.plat-card.available::before{background:var(--g);}
+.plat-card.unavailable::before{background:#333;}
+.plat-card.available:hover{border-color:rgba(0,255,65,.4);background:rgba(0,255,65,.03);}
+.plat-card.available:hover::before{box-shadow:0 0 12px var(--g);}
+.plat-card.unavailable{opacity:.6;}
+.plat-os{font-family:var(--font-head);font-weight:700;font-size:42px;color:var(--g);margin-bottom:8px;letter-spacing:2px;display:flex;align-items:center;gap:16px;}
+.plat-card.unavailable .plat-os{color:#444;}
+.plat-os-icon{font-size:36px;}
+.plat-status{font-size:9px;letter-spacing:4px;padding:3px 12px;border:1px solid;display:inline-block;margin-bottom:24px;}
+.status-available{color:var(--g);border-color:rgba(0,255,65,.3);}
+.status-soon{color:#555;border-color:#333;}
+.plat-specs{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);margin-bottom:28px;}
+.plat-spec{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);font-size:10px;}
+.plat-spec:last-child{border-bottom:none;}
+.plat-spec:hover{background:var(--gs);}
+.spec-k{color:var(--gd);letter-spacing:2px;}
+.spec-v{color:var(--g);}
+.spec-v.warn{color:var(--y);}
+.spec-v.no{color:#555;}
+
+/* BUTTONS */
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:var(--font-head);font-size:16px;font-weight:700;letter-spacing:4px;text-decoration:none;text-transform:uppercase;position:relative;overflow:hidden;transition:all .2s;animation:pulse-glow 3s ease-in-out infinite;cursor:pointer;}
+.btn-dl::before{content:'';position:absolute;inset:0;background:var(--g);transform:translateX(-101%);transition:transform .2s;}
+.btn-dl:hover::before{transform:translateX(0);}
+.btn-dl:hover{color:#000;}
+.btn-dl span{position:relative;z-index:1;}
+.btn-disabled{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;border:1px solid #333;background:transparent;color:#444;font-family:var(--font-head);font-size:16px;font-weight:700;letter-spacing:4px;text-decoration:none;text-transform:uppercase;cursor:not-allowed;}
+.btn-note{font-size:9px;color:var(--gd);letter-spacing:2px;text-align:center;margin-top:10px;}
+.btn-note::before{content:'$ ';}
+
+/* MAC UNAVAILABLE MESSAGE */
+.mac-msg{margin-top:20px;border:1px solid rgba(255,0,51,.2);background:rgba(255,0,51,.03);padding:16px;font-size:10px;color:rgba(255,0,51,.5);line-height:1.8;letter-spacing:.5px;}
+.mac-msg::before{content:'⚠ NOTE\A';white-space:pre;color:var(--r);display:block;margin-bottom:6px;font-size:9px;letter-spacing:3px;}
+.mac-msg a{color:var(--gm);text-decoration:none;}
+.mac-msg a:hover{color:var(--g);}
+
+/* DEMO SECTION */
+.demo-section{padding:0 40px 80px;max-width:1100px;margin:0 auto;}
+.demo-divider{display:flex;align-items:center;gap:20px;margin-bottom:48px;}
+.demo-divider::before,.demo-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.demo-divider span{font-size:9px;color:var(--gd);letter-spacing:5px;white-space:nowrap;}
+.demo-card{border:1px solid rgba(204,0,255,.2);background:rgba(10,0,20,.9);padding:40px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;animation:fadeUp .6s .3s ease both;}
+.demo-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--p);}
+.demo-card:hover{border-color:rgba(204,0,255,.4);}
+@media(max-width:700px){.demo-card{grid-template-columns:1fr;}}
+.demo-tag{font-size:9px;color:rgba(204,0,255,.4);letter-spacing:4px;margin-bottom:12px;}
+.demo-tag::before{content:'// ';}
+.demo-h{font-family:var(--font-head);font-weight:700;font-size:28px;color:var(--p);margin-bottom:12px;letter-spacing:2px;text-shadow:0 0 20px rgba(204,0,255,.3);}
+.demo-p{font-family:var(--font-head);font-weight:300;font-size:14px;color:rgba(204,0,255,.5);line-height:1.8;margin-bottom:20px;}
+.demo-features{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.demo-feat{font-size:10px;color:rgba(204,0,255,.4);letter-spacing:1px;}
+.demo-feat::before{content:'✓ ';}
+.demo-feat.no{color:#444;}
+.demo-feat.no::before{content:'✗ ';color:#333;}
+.btn-demo{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 32px;border:1px solid var(--p);background:transparent;color:var(--p);font-family:var(--font-head);font-size:14px;font-weight:700;letter-spacing:3px;text-decoration:none;text-transform:uppercase;position:relative;overflow:hidden;transition:all .2s;white-space:nowrap;}
+.btn-demo::before{content:'';position:absolute;inset:0;background:var(--p);transform:translateX(-101%);transition:transform .2s;}
+.btn-demo:hover::before{transform:translateX(0);}
+.btn-demo:hover{color:#000;}
+.btn-demo span{position:relative;z-index:1;}
+.demo-note{font-size:9px;color:rgba(204,0,255,.25);letter-spacing:1px;margin-top:10px;text-align:center;}
+
+/* FOOTER */
+footer{padding:24px 40px;background:#000;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.f-logo{font-family:var(--font-head);font-weight:700;font-size:14px;color:var(--gm);letter-spacing:4px;}
+.f-txt{font-size:9px;color:rgba(0,255,65,.15);letter-spacing:2px;}
+.f-osiris{font-size:9px;color:rgba(204,0,255,.25);letter-spacing:2px;animation:blink 4s step-end infinite;}
+@media(max-width:600px){footer{flex-direction:column;gap:8px;text-align:center;}.page-hero{padding:60px 20px 40px;}.platforms,.demo-section{padding-left:20px;padding-right:20px;}}
+</style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div id="crt"></div>
+<div class="scanline"></div>
+
+<div id="topbar">
+  <div class="tb-logo">VERTEX CYPHER</div>
+  <div style="display:flex;align-items:center;gap:0;">
+    <a href="index.html" class="tb-back" style="color:var(--gm);font-size:10px;letter-spacing:2px;text-decoration:none;padding:0 16px;border-left:1px solid var(--border);height:42px;line-height:42px;display:block;">RETOUR AU SITE</a>
+    <nav class="tb-nav">
+      <a href="index.html#lore">LORE</a>
+      <a href="index.html#voiles">VOILES</a>
+      <a href="index.html#osiris">OSIRIS</a>
+    </nav>
+  </div>
+</div>
+
+<div id="app">
+  <div class="page-hero">
+    <div class="ph-tag">ACCÈS AUTORISÉ — GHOST PROTOCOL — TÉLÉCHARGEMENT</div>
+    <h1 class="ph-h">TÉLÉCHARGER<br><em>LA MISSION</em></h1>
+    <div class="ph-sub">// CHOISISSEZ VOTRE PLATEFORME — VERSION 1.1 — ALPHA</div>
+    <div class="ph-badge">⚠ BETA ACTIVE — MISE À JOUR FRÉQUENTE</div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="platforms">
+    <div class="plat-title">PLATEFORMES DISPONIBLES</div>
+    <div class="plat-grid">
+
+      <!-- WINDOWS -->
+      <div class="plat-card available" style="animation-delay:.1s">
+        <div class="plat-os"><span class="plat-os-icon">🪟</span> WINDOWS</div>
+        <div class="plat-status status-available">✓ DISPONIBLE</div>
+        <div class="plat-specs">
+          <div class="plat-spec"><span class="spec-k">VERSION</span><span class="spec-v">Windows 10 / 11</span></div>
+          <div class="plat-spec"><span class="spec-k">PRÉREQUIS</span><span class="spec-v">Aucun — .exe standalone</span></div>
+          <div class="plat-spec"><span class="spec-k">TAILLE</span><span class="spec-v">~25 MB</span></div>
+          <div class="plat-spec"><span class="spec-k">INSTALLEUR</span><span class="spec-v">VertexCypherSetup.exe</span></div>
+          <div class="plat-spec"><span class="spec-k">BUILD</span><span class="spec-v warn">v1.1 — Beta</span></div>
+        </div>
+        <a href="https://github.com/FKsauron56/vertexcypher.github.io/releases/download/v1.1/VertexCypherSetup.exe" class="btn-dl">
+          <span>⬇ TÉLÉCHARGER WINDOWS</span>
+        </a>
+        <div class="btn-note">VertexCypherSetup.exe — installation guidée</div>
+      </div>
+
+      <!-- MAC -->
+      <div class="plat-card unavailable" style="animation-delay:.2s">
+        <div class="plat-os" style="color:#444;"><span class="plat-os-icon" style="filter:grayscale(1);opacity:.3;">🍎</span> MACOS</div>
+        <div class="plat-status status-soon">✗ NON DISPONIBLE</div>
+        <div class="plat-specs">
+          <div class="plat-spec"><span class="spec-k">VERSION</span><span class="spec-v no">—</span></div>
+          <div class="plat-spec"><span class="spec-k">PRÉREQUIS</span><span class="spec-v no">—</span></div>
+          <div class="plat-spec"><span class="spec-k">TAILLE</span><span class="spec-v no">—</span></div>
+          <div class="plat-spec"><span class="spec-k">INSTALLEUR</span><span class="spec-v no">Pas encore compilé</span></div>
+          <div class="plat-spec"><span class="spec-k">BUILD</span><span class="spec-v no">Non disponible</span></div>
+        </div>
+        <div class="btn-disabled">
+          <span>🔒 MAC — NON DISPONIBLE</span>
+        </div>
+        <div class="mac-msg">
+          La version Mac n'est pas encore compilée.<br>
+          Alternative : si Python 3 est installé sur votre Mac,<br>
+          vous pouvez lancer le jeu directement :<br><br>
+          <code style="color:var(--g);">python3 vertex_cypher_final.py</code><br><br>
+          Sources disponibles sur <a href="https://github.com/FKsauron56/vertexcypher.github.io" target="_blank">GitHub →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DEMO SECTION -->
+  <div class="demo-section">
+    <div class="demo-divider"><span>OU ESSAYEZ SANS INSTALLER</span></div>
+    <div class="demo-card">
+      <div>
+        <div class="demo-tag">VERSION NAVIGATEUR — AUCUNE INSTALLATION</div>
+        <h2 class="demo-h">DÉMO EN LIGNE</h2>
+        <p class="demo-p">Une version simplifiée jouable directement dans votre navigateur.<br>Tous les 11 voiles accessibles, terminal complet.</p>
+        <div class="demo-features">
+          <div class="demo-feat">11 Voiles débloqués</div>
+          <div class="demo-feat">Terminal interactif complet</div>
+          <div class="demo-feat">Tous les serveurs accessibles</div>
+          <div class="demo-feat">Dialogues OSIRIS</div>
+          <div class="demo-feat no">Sauvegarde automatique</div>
+          <div class="demo-feat no">Achievements</div>
+          <div class="demo-feat no">Easter eggs SF</div>
+          <div class="demo-feat no">Journal de bord</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <a href="demo.html" class="btn-demo"><span>▶ LANCER LA DÉMO</span></a>
+        <div class="demo-note">Aucune installation requise</div>
+        <div class="demo-note" style="margin-top:4px;">💜 OSIRIS vous attend</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="f-logo">VERTEX CYPHER</div>
+    <div class="f-txt">GHOST PROTOCOL ALPHA // FICTION // 2045</div>
+    <div class="f-osiris">💜 OSIRIS ÉTAIT LÀ AVANT VOUS</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const c=document.getElementById('rain'),ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  const chars='アイウエオ0123456789ABCDEF∑∏∫√∞≈⌬⊕';
+  const cols=Math.floor(c.width/18),drops=Array(cols).fill(1);
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.05)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.font='14px monospace';
+    drops.forEach((y,i)=>{
+      const b=Math.random()>.85;
+      ctx.fillStyle=b?'#aaffcc':'#00ff41';ctx.globalAlpha=b?.9:.35;
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,y*18);
+      ctx.globalAlpha=1;
+      if(y*18>c.height&&Math.random()>.96)drops[i]=0;
+      drops[i]++;
+    });
+  }
+  setInterval(draw,45);
+})();
+</script>
+</body>
+</html>
