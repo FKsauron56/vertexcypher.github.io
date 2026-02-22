@@ -9,51 +9,130 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --g:#00ff41;--gd:#003b0f;--gm:#00bb30;--gs:rgba(0,255,65,.06);
-  --r:#ff0033;--p:#cc00ff;--y:#ffcc00;--bg:#010a03;
+  --r:#ff0033;--p:#cc00ff;--pd:#440055;--y:#ffcc00;--bg:#010a03;
   --border:rgba(0,255,65,.18);
   --font-crt:'VT323',monospace;
   --font-ui:'Share Tech Mono',monospace;
   --font-head:'Rajdhani',sans-serif;
 }
-html,body{width:100%;height:100vh;background:var(--bg);color:var(--g);font-family:var(--font-ui);overflow:hidden;}
+html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--g);font-family:var(--font-ui);overflow-x:hidden;}
 #crt{position:fixed;inset:0;z-index:9999;pointer-events:none;}
 #crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.2) 2px,rgba(0,0,0,.2) 4px);}
 #crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.6) 100%);}
 @keyframes blink{50%{opacity:0;}}
-@keyframes osiris-breathe{0%,100%{opacity:.7;text-shadow:0 0 20px var(--p);}50%{opacity:1;text-shadow:0 0 50px var(--p),0 0 100px rgba(204,0,255,.3);}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes osiris{0%,100%{opacity:.6;text-shadow:0 0 20px var(--p);}50%{opacity:1;text-shadow:0 0 60px var(--p);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes scan{0%{top:-5%;}100%{top:105%;}}
 @keyframes glitch{0%,90%,100%{transform:none;}91%{transform:translate(-3px,0);}92%{transform:translate(3px,0);}93%{transform:none;}}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px var(--g);}50%{box-shadow:0 0 24px var(--g),0 0 50px rgba(0,255,65,.2);}}
+.scanline{position:fixed;left:0;right:0;height:3px;z-index:9998;background:linear-gradient(90deg,transparent,rgba(0,255,65,.15),transparent);animation:scan 6s linear infinite;pointer-events:none;}
 
-/* LAYOUT */
-#app{width:100%;height:100vh;display:grid;grid-template-rows:42px 1fr 52px;grid-template-columns:1fr 260px;}
+/* ============================================================
+   ÉCRAN DE CHOIX
+   ============================================================ */
+#choose{position:fixed;inset:0;z-index:500;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.ch-tag{font-size:10px;color:var(--gd);letter-spacing:5px;margin-bottom:14px;animation:fadeUp .5s ease both;}
+.ch-tag::before{content:'// ';}
+.ch-title{font-family:var(--font-head);font-weight:700;font-size:clamp(40px,7vw,90px);color:var(--g);text-shadow:0 0 40px rgba(0,255,65,.4);line-height:.9;text-align:center;animation:fadeUp .5s .1s ease both;}
+.ch-title em{display:block;font-style:normal;color:transparent;-webkit-text-stroke:1px var(--g);font-size:.55em;letter-spacing:8px;}
+.ch-sub{font-size:11px;color:rgba(0,255,65,.35);letter-spacing:4px;margin:14px 0 36px;text-align:center;animation:fadeUp .5s .2s ease both;}
+.ch-q{font-size:13px;color:var(--gm);letter-spacing:3px;margin-bottom:28px;text-align:center;animation:fadeUp .5s .3s ease both;}
+.ch-q::before{content:'> ';}
+.ch-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:620px;width:100%;animation:fadeUp .5s .35s ease both;}
+@media(max-width:480px){.ch-cards{grid-template-columns:1fr;max-width:340px;}}
+.ch-card{border:1px solid var(--border);background:rgba(0,5,2,.9);padding:30px 24px;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;text-align:center;}
+.ch-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gd);transition:all .3s;}
+.ch-card:hover{border-color:rgba(0,255,65,.45);background:rgba(0,255,65,.04);transform:translateY(-2px);}
+.ch-card:hover::before{background:var(--g);box-shadow:0 0 12px var(--g);}
+.ch-card.mob::before{background:var(--pd);}
+.ch-card.mob:hover{border-color:rgba(204,0,255,.45);background:rgba(204,0,255,.04);}
+.ch-card.mob:hover::before{background:var(--p);box-shadow:0 0 12px var(--p);}
+.ch-icon{font-size:44px;display:block;margin-bottom:14px;}
+.ch-name{font-family:var(--font-head);font-weight:700;font-size:20px;letter-spacing:3px;color:var(--g);margin-bottom:8px;}
+.ch-card.mob .ch-name{color:var(--p);}
+.ch-desc{font-family:var(--font-head);font-weight:300;font-size:12px;color:rgba(0,255,65,.4);line-height:1.7;margin-bottom:14px;}
+.ch-card.mob .ch-desc{color:rgba(204,0,255,.4);}
+.ch-feats{display:flex;flex-direction:column;gap:4px;text-align:left;}
+.ch-feat{font-size:9px;letter-spacing:1px;}
+.ch-feat.ok::before{content:'✓ ';color:var(--gm);}
+.ch-feat.ok{color:rgba(0,255,65,.5);}
+.ch-feat.star::before{content:'★ ';color:var(--p);}
+.ch-feat.star{color:rgba(204,0,255,.5);}
+.ch-osiris{margin-top:36px;font-size:11px;color:rgba(204,0,255,.4);letter-spacing:2px;animation:osiris 4s ease-in-out infinite,fadeUp .5s .45s ease both;}
 
-/* TOPBAR */
-#topbar{grid-column:1/-1;background:rgba(0,0,0,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:10px;z-index:10;}
-.tb-left{display:flex;align-items:center;gap:20px;}
-.tb-logo{font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--g);letter-spacing:3px;text-shadow:0 0 15px var(--g);animation:glitch 12s infinite;}
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:42px;background:rgba(0,0,0,.98);border-bottom:1px solid var(--border);display:none;align-items:center;justify-content:space-between;padding:0 14px;font-size:10px;}
+.tb-logo{font-family:var(--font-head);font-weight:700;font-size:14px;color:var(--g);letter-spacing:3px;text-shadow:0 0 15px var(--g);animation:glitch 12s infinite;}
 .tb-logo::before{content:'▶ ';}
+.tb-left{display:flex;align-items:center;gap:14px;}
 .tb-item{color:var(--gm);letter-spacing:2px;font-size:9px;}
 .tb-item span{color:var(--g);}
-.tb-badge{color:var(--y);font-size:9px;letter-spacing:2px;animation:blink 2s step-end infinite;border:1px solid rgba(255,204,0,.3);padding:2px 8px;}
-.tb-right{display:flex;align-items:center;gap:0;}
-.tb-btn{padding:0 14px;height:42px;line-height:42px;font-size:9px;letter-spacing:2px;color:var(--gd);text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);transition:all .15s;cursor:pointer;background:none;border-top:none;border-bottom:none;border-right:none;display:block;}
+.tb-badge{color:var(--y);font-size:9px;letter-spacing:2px;animation:blink 2s step-end infinite;border:1px solid rgba(255,204,0,.3);padding:2px 7px;}
+.tb-right{display:flex;}
+.tb-btn{padding:0 12px;height:42px;line-height:42px;font-size:9px;letter-spacing:2px;color:var(--gd);text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);transition:all .15s;cursor:pointer;background:none;border-top:none;border-bottom:none;border-right:none;display:block;}
 .tb-btn:hover{background:var(--gs);color:var(--g);}
-.tb-btn.back{color:var(--gm);}
 
-/* TERMINAL */
-#terminal{background:#000;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-#terminal-header{background:#020a03;border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+/* ============================================================
+   VERSION PC
+   ============================================================ */
+#app-pc{display:none;width:100%;height:100vh;padding-top:42px;}
+#app-pc.on{display:grid;grid-template-rows:1fr 50px;grid-template-columns:1fr 260px;}
+#term-pc{background:#000;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+#term-header{background:#020a03;border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .dot{width:10px;height:10px;border-radius:50%;}
-.dt-r{background:#ff3b30;}.dt-y{background:#ffcc00;}.dt-g{background:#28cd41;}
-#terminal-title{font-size:10px;color:var(--gd);letter-spacing:3px;margin-left:8px;flex:1;}
+.dr{background:#ff3b30;}.dy{background:#ffcc00;}.dg{background:#28cd41;}
+#term-title{font-size:10px;color:var(--gd);letter-spacing:3px;margin-left:6px;flex:1;}
 #trace-mini{font-size:9px;color:var(--r);letter-spacing:2px;}
-#output{flex:1;overflow-y:auto;padding:14px;font-family:var(--font-crt);font-size:16px;line-height:1.5;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
-#output::-webkit-scrollbar{width:4px;}
-#output::-webkit-scrollbar-track{background:#000;}
-#output::-webkit-scrollbar-thumb{background:var(--gd);}
+#out-pc{flex:1;overflow-y:auto;padding:14px;font-family:var(--font-crt);font-size:16px;line-height:1.5;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
+#out-pc::-webkit-scrollbar{width:4px;}
+#out-pc::-webkit-scrollbar-thumb{background:var(--gd);}
+#in-pc{background:#000;border-top:1px solid var(--border);border-right:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;}
+#prompt-pc{color:var(--gm);font-family:var(--font-crt);font-size:16px;white-space:nowrap;}
+#cmd-pc{flex:1;background:transparent;border:none;outline:none;color:var(--g);font-family:var(--font-crt);font-size:16px;caret-color:var(--g);}
+#right-pc{background:#000;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;grid-row:1/-1;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
+#right-pc::-webkit-scrollbar{width:3px;}
+#right-pc::-webkit-scrollbar-thumb{background:var(--gd);}
+#sb-pc{grid-column:1;background:#000;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:var(--gd);letter-spacing:2px;}
+#sb-pc span{color:var(--g);}
+.sb-warn{color:var(--y);animation:blink 3s step-end infinite;}
+
+/* ============================================================
+   VERSION MOBILE
+   ============================================================ */
+#app-mob{display:none;width:100%;min-height:100vh;padding-top:42px;flex-direction:column;}
+#app-mob.on{display:flex;}
+#mob-stats{background:#000;border-bottom:1px solid var(--border);padding:8px 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:10px;flex-shrink:0;}
+.ms{color:var(--gm);letter-spacing:1px;}
+.ms span{color:var(--g);}
+.ms-bar-wrap{flex:1;min-width:60px;background:#001a06;height:5px;border:1px solid var(--gd);}
+.ms-bar-fill{height:100%;background:var(--g);transition:width .4s;width:0%;}
+#out-mob{flex:1;overflow-y:auto;padding:10px 12px;font-family:var(--font-crt);font-size:17px;line-height:1.6;min-height:150px;max-height:calc(100vh - 310px);}
+#quickbtns{background:#000;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;padding:7px 10px;gap:7px;flex-shrink:0;}
+#quickbtns::-webkit-scrollbar{display:none;}
+.qb{flex-shrink:0;padding:7px 13px;border:1px solid var(--border);background:transparent;color:var(--gm);font-family:var(--font-ui);font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .15s;}
+.qb:active{background:var(--gs);color:var(--g);border-color:var(--g);}
+.qb.oq{border-color:rgba(204,0,255,.3);color:rgba(204,0,255,.6);}
+.qb.oq:active{background:rgba(204,0,255,.1);color:var(--p);}
+#in-mob{background:#000;border-top:1px solid var(--border);display:flex;align-items:center;padding:9px 12px;gap:8px;flex-shrink:0;}
+#prompt-mob{color:var(--gm);font-family:var(--font-crt);font-size:15px;white-space:nowrap;flex-shrink:0;}
+#cmd-mob{flex:1;background:#050f06;border:1px solid var(--gd);outline:none;color:var(--g);font-family:var(--font-crt);font-size:16px;padding:8px 10px;caret-color:var(--g);}
+#send-mob{padding:8px 16px;background:var(--gd);border:1px solid var(--g);color:var(--g);font-family:var(--font-ui);font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .15s;flex-shrink:0;}
+#send-mob:active{background:var(--g);color:#000;}
+#mob-panels{display:flex;border-top:1px solid var(--border);max-height:160px;flex-shrink:0;}
+#mob-frags{flex:1;border-right:1px solid var(--border);overflow-y:auto;padding:8px;scrollbar-width:none;}
+#mob-frags::-webkit-scrollbar{display:none;}
+#mob-lvls{flex:1;overflow-y:auto;padding:8px;scrollbar-width:none;}
+#mob-lvls::-webkit-scrollbar{display:none;}
+.mp-lbl{font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:5px;}
+
+/* ============================================================
+   PARTAGÉ
+   ============================================================ */
 .line{margin:1px 0;animation:fadeIn .2s ease;}
 .line.cmd{color:var(--g);}
-.line.sys{color:#005522;}
 .line.info{color:var(--gm);}
 .line.error{color:var(--r);}
 .line.warning{color:var(--y);}
@@ -62,744 +141,528 @@ html,body{width:100%;height:100vh;background:var(--bg);color:var(--g);font-famil
 .line.ghost{color:#5599ff;}
 .line.highlight{color:var(--y);}
 .line.dim{color:#2a4a2a;}
-
-/* INPUT */
-#input-bar{grid-column:1;background:#000;border-top:1px solid var(--border);border-right:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;}
-#prompt{color:var(--gm);font-family:var(--font-crt);font-size:16px;white-space:nowrap;}
-#cmd-input{flex:1;background:transparent;border:none;outline:none;color:var(--g);font-family:var(--font-crt);font-size:16px;caret-color:var(--g);}
-
-/* RIGHT PANEL */
-#right{background:#000;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
-#right::-webkit-scrollbar{width:3px;}
-#right::-webkit-scrollbar-thumb{background:var(--gd);}
-.panel-section{border-bottom:1px solid var(--border);padding:12px;}
-.panel-label{font-size:8px;color:var(--gd);letter-spacing:4px;margin-bottom:8px;}
-.stat-row{display:flex;justify-content:space-between;font-size:10px;margin:4px 0;}
-.stat-k{color:#005522;letter-spacing:1px;}
-.stat-v{color:var(--g);}
-.stat-v.warn{color:var(--y);}
-.stat-v.danger{color:var(--r);}
-.stat-v.osiris{color:var(--p);}
-.trace-bar-wrap{background:#001a06;height:6px;margin:6px 0;border:1px solid var(--gd);}
-.trace-bar-fill{height:100%;background:var(--g);transition:width .5s;width:0%;}
-.trace-bar-fill.warn{background:var(--y);}
-.trace-bar-fill.danger{background:var(--r);}
-
-/* FRAGMENTS */
-.frag-item{font-size:10px;color:var(--gd);margin:2px 0;padding:4px 6px;letter-spacing:1px;}
-.frag-item.collected{color:var(--g);background:rgba(0,255,65,.05);}
-.frag-item.collected::before{content:'✦ ';}
-.frag-item:not(.collected)::before{content:'○ ';}
-
-/* LEVELS */
-.level-btn{display:block;width:100%;padding:6px 8px;background:none;border:none;border-bottom:1px solid #001a06;color:var(--gd);font-family:var(--font-ui);font-size:9px;letter-spacing:2px;text-align:left;cursor:pointer;transition:all .15s;}
-.level-btn:hover{background:var(--gs);color:var(--g);}
-.level-btn.active{color:var(--g);background:rgba(0,255,65,.08);}
-.level-btn.active::before{content:'▶ ';}
-.level-btn.locked{color:#1a1a1a;cursor:not-allowed;}
-
-/* OSIRIS WIDGET */
-.osiris-widget{padding:14px;text-align:center;}
-.osiris-eye{font-size:32px;display:block;animation:osiris-breathe 4s ease-in-out infinite;cursor:pointer;margin-bottom:6px;}
-.osiris-msg{font-size:11px;color:rgba(204,0,255,.6);line-height:1.5;font-family:var(--font-head);font-weight:300;min-height:36px;transition:all .4s;}
-
-/* STATUS BAR */
-#statusbar{grid-column:1/-1;background:#000;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:var(--gd);letter-spacing:2px;}
-.sb-item span{color:var(--g);}
-.sb-item.danger span{color:var(--r);}
-.sb-mode{color:var(--y);animation:blink 3s step-end infinite;}
-
-/* MOBILE */
-@media(max-width:700px){
-  #app{grid-template-columns:1fr;grid-template-rows:42px 1fr 200px 52px;}
-  #right{grid-row:3;border-left:none;border-top:1px solid var(--border);flex-direction:row;overflow-x:auto;overflow-y:hidden;}
-  .panel-section{min-width:160px;border-right:1px solid var(--border);border-bottom:none;}
-  #input-bar{grid-column:1;}
-}
+.p-section{border-bottom:1px solid var(--border);padding:11px;}
+.p-lbl{font-size:8px;color:var(--gd);letter-spacing:4px;margin-bottom:7px;}
+.p-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}
+.p-k{color:#005522;letter-spacing:1px;}
+.p-v{color:var(--g);}
+.tbar{background:#001a06;height:6px;margin:5px 0;border:1px solid var(--gd);}
+.tfill{height:100%;background:var(--g);transition:width .5s;width:0%;}
+.tfill.w{background:var(--y);}.tfill.d{background:var(--r);}
+.fi{font-size:10px;color:var(--gd);margin:2px 0;padding:3px 5px;}
+.fi.got{color:var(--g);background:rgba(0,255,65,.05);}
+.fi.got::before{content:'✦ ';}
+.fi:not(.got)::before{content:'○ ';}
+.lvl-btn{display:block;width:100%;padding:5px 8px;background:none;border:none;border-bottom:1px solid #001a06;color:var(--gd);font-family:var(--font-ui);font-size:9px;letter-spacing:1px;text-align:left;cursor:pointer;transition:all .15s;}
+.lvl-btn:hover{background:var(--gs);color:var(--g);}
+.lvl-btn.cur{color:var(--g);background:rgba(0,255,65,.08);}
+.lvl-btn.cur::before{content:'▶ ';}
+.lvl-btn.lock{color:#1a1a1a;cursor:not-allowed;}
+.ow{padding:12px;text-align:center;}
+.oeye{font-size:28px;display:block;animation:osiris 4s ease-in-out infinite;cursor:pointer;margin-bottom:4px;}
+.omsg{font-size:10px;color:rgba(204,0,255,.6);line-height:1.5;font-family:var(--font-head);font-weight:300;min-height:30px;transition:all .4s;}
 </style>
 </head>
 <body>
 <div id="crt"></div>
+<div class="scanline"></div>
 
-<div id="app">
-  <!-- TOPBAR -->
-  <div id="topbar">
-    <div class="tb-left">
-      <div class="tb-logo">VERTEX CYPHER</div>
-      <div class="tb-item">OPÉRATEUR: <span>GHOST-057f</span></div>
-      <div class="tb-item">VOILE: <span id="tb-voile">01/11</span></div>
-      <div class="tb-item">TRACE: <span id="tb-trace">0.0%</span></div>
-      <div class="tb-badge">⚠ DÉMO — FONCTIONS LIMITÉES</div>
-    </div>
-    <div class="tb-right">
-      <a href="download.html" class="tb-btn back">⬇ VERSION COMPLÈTE</a>
-      <a href="index.html" class="tb-btn">← SITE</a>
-    </div>
-  </div>
+<!-- ============================================================
+     ÉCRAN DE CHOIX
+     ============================================================ -->
+<div id="choose">
+  <div class="ch-tag">VERTEX CYPHER — DÉMO INTERACTIVE</div>
+  <h1 class="ch-title">CHOISIR<br><em>VOTRE TERMINAL</em></h1>
+  <div class="ch-sub">// GHOST PROTOCOL — SESSION EN ATTENTE</div>
+  <div class="ch-q">Sur quel appareil jouez-vous ?</div>
+  <div class="ch-cards">
 
-  <!-- TERMINAL -->
-  <div id="terminal">
-    <div id="terminal-header">
-      <div class="dot dt-r"></div><div class="dot dt-y"></div><div class="dot dt-g"></div>
-      <div id="terminal-title">GHOST-NET // SESSION ACTIVE // VERTEX ROOT v1.1</div>
-      <div id="trace-mini">TRACE: <span id="trace-pct">0%</span></div>
-    </div>
-    <div id="output"></div>
-  </div>
-
-  <!-- INPUT -->
-  <div id="input-bar">
-    <div id="prompt">root@ghost-protocol:~#</div>
-    <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="tapez une commande...">
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div id="right">
-
-    <div class="panel-section">
-      <div class="panel-label">STATUT MISSION</div>
-      <div class="stat-row"><span class="stat-k">NIVEAU</span><span class="stat-v" id="p-niveau">01/11</span></div>
-      <div class="stat-row"><span class="stat-k">VOILE</span><span class="stat-v" id="p-voile">CHIMÈRE</span></div>
-      <div class="stat-row"><span class="stat-k">FRAGMENTS</span><span class="stat-v" id="p-frags">0/11</span></div>
-      <div class="stat-row"><span class="stat-k">RÉPUTATION</span><span class="stat-v">100</span></div>
-      <div style="margin-top:8px;">
-        <div style="font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:3px;">TRACE</div>
-        <div class="trace-bar-wrap"><div class="trace-bar-fill" id="trace-fill"></div></div>
-        <div style="font-size:9px;color:var(--r);text-align:right;" id="trace-val">0%</div>
+    <div class="ch-card" onclick="launch('pc')">
+      <span class="ch-icon">🖥️</span>
+      <div class="ch-name">PC / TABLETTE</div>
+      <p class="ch-desc">Interface bureau complète avec panneau latéral et clavier.</p>
+      <div class="ch-feats">
+        <div class="ch-feat ok">Terminal plein écran</div>
+        <div class="ch-feat ok">Panneau stats latéral</div>
+        <div class="ch-feat ok">Historique clavier ↑↓</div>
+        <div class="ch-feat ok">Fragments + niveaux visibles</div>
       </div>
     </div>
 
-    <div class="panel-section">
-      <div class="panel-label">NIVEAUX</div>
-      <div id="levels-list"></div>
-    </div>
-
-    <div class="panel-section">
-      <div class="panel-label">FRAGMENTS</div>
-      <div id="frags-list"></div>
-    </div>
-
-    <div class="osiris-widget">
-      <span class="osiris-eye" id="osiris-eye">👁</span>
-      <div class="osiris-msg" id="osiris-msg">"Je vous vois déjà."</div>
+    <div class="ch-card mob" onclick="launch('mob')">
+      <span class="ch-icon">📱</span>
+      <div class="ch-name">MOBILE</div>
+      <p class="ch-desc">Interface tactile avec boutons rapides et clavier adapté.</p>
+      <div class="ch-feats">
+        <div class="ch-feat star">Boutons commandes rapides</div>
+        <div class="ch-feat star">Clavier virtuel optimisé</div>
+        <div class="ch-feat star">Layout vertical adapté</div>
+        <div class="ch-feat star">Ergonomique et tactile</div>
+      </div>
     </div>
 
   </div>
+  <div class="ch-osiris">💜 OSIRIS: "Je vous attendais. Choisissez votre terminal."</div>
+</div>
 
-  <!-- STATUS BAR -->
-  <div id="statusbar">
-    <div class="sb-item">SESSION: <span id="sb-session">00:00:00</span></div>
-    <div class="sb-item">SERVEUR: <span id="sb-server">AUCUN</span></div>
-    <div class="sb-item">COMMANDES: <span id="sb-cmds">0</span></div>
-    <div class="sb-mode">⚠ DÉMO — SAUVEGARDE DÉSACTIVÉE</div>
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<div id="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">VERTEX CYPHER</div>
+    <div class="tb-item">VOILE: <span id="tb-v">01/11</span></div>
+    <div class="tb-item">TRACE: <span id="tb-t">0.0%</span></div>
+    <div class="tb-badge">⚠ DÉMO</div>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="backToChoose()">⇄ CHANGER</button>
+    <a href="download.html" class="tb-btn" style="color:var(--gm);">⬇ VERSION COMPLÈTE</a>
+    <a href="index.html" class="tb-btn">← SITE</a>
+  </div>
+</div>
+
+<!-- ============================================================
+     VERSION PC
+     ============================================================ -->
+<div id="app-pc">
+  <div id="term-pc">
+    <div id="term-header">
+      <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+      <div id="term-title">GHOST-NET // SESSION ACTIVE // VERTEX ROOT v1.1</div>
+      <div id="trace-mini">TRACE: <span id="tpct">0%</span></div>
+    </div>
+    <div id="out-pc"></div>
+  </div>
+
+  <div id="right-pc">
+    <div class="p-section">
+      <div class="p-lbl">STATUT MISSION</div>
+      <div class="p-row"><span class="p-k">NIVEAU</span><span class="p-v" id="pniv">01/11</span></div>
+      <div class="p-row"><span class="p-k">VOILE</span><span class="p-v" id="pvoile">CHIMÈRE</span></div>
+      <div class="p-row"><span class="p-k">FRAGMENTS</span><span class="p-v" id="pfrags">0/11</span></div>
+      <div style="margin-top:7px;">
+        <div style="font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:3px;">TRACE</div>
+        <div class="tbar"><div class="tfill" id="tfill-pc"></div></div>
+        <div style="font-size:9px;color:var(--r);text-align:right;" id="tval-pc">0%</div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-lbl">NIVEAUX</div>
+      <div id="lvls-pc"></div>
+    </div>
+    <div class="p-section">
+      <div class="p-lbl">FRAGMENTS</div>
+      <div id="frags-pc"></div>
+    </div>
+    <div class="ow">
+      <span class="oeye" id="oeye-pc">👁</span>
+      <div class="omsg" id="omsg-pc">"Je vous vois déjà."</div>
+    </div>
+  </div>
+
+  <div id="in-pc">
+    <div id="prompt-pc">root@ghost-protocol:~#</div>
+    <input id="cmd-pc" type="text" autocomplete="off" spellcheck="false" placeholder="tapez une commande...">
+  </div>
+
+  <div id="sb-pc">
+    <div>SESSION: <span id="timer">00:00:00</span></div>
+    <div>SERVEUR: <span id="sb-srv">AUCUN</span></div>
+    <div>CMDS: <span id="sb-cmds">0</span></div>
+    <div class="sb-warn">⚠ DÉMO — SANS SAUVEGARDE</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VERSION MOBILE
+     ============================================================ -->
+<div id="app-mob">
+  <div id="mob-stats">
+    <div class="ms">VOILE: <span id="ms-v">01</span></div>
+    <div class="ms">FRAGS: <span id="ms-f">0/11</span></div>
+    <div class="ms">TRACE: <span id="ms-t">0%</span></div>
+    <div class="ms-bar-wrap"><div class="ms-bar-fill" id="ms-fill"></div></div>
+  </div>
+
+  <div id="out-mob"></div>
+
+  <div id="quickbtns">
+    <button class="qb" onclick="sc('scanner')">📡 Scanner</button>
+    <button class="qb" onclick="sc('ls')">📁 ls</button>
+    <button class="qb" onclick="sc('aide')">❓ Aide</button>
+    <button class="qb" onclick="sc('trace')">⚠️ Trace</button>
+    <button class="qb" onclick="sc('fragments')">✦ Fragments</button>
+    <button class="qb" onclick="sc('deconnecter')">🔌 Déco</button>
+    <button class="qb" onclick="sc('clear')">🗑️ Clear</button>
+    <button class="qb oq" onclick="osirisClick()">💜 OSIRIS</button>
+  </div>
+
+  <div id="in-mob">
+    <div id="prompt-mob">~#</div>
+    <input id="cmd-mob" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="commande...">
+    <button id="send-mob" onclick="mobSend()">▶</button>
+  </div>
+
+  <div id="mob-panels">
+    <div id="mob-frags">
+      <div class="mp-lbl">FRAGMENTS</div>
+      <div id="frags-mob"></div>
+    </div>
+    <div id="mob-lvls">
+      <div class="mp-lbl">NIVEAUX</div>
+      <div id="lvls-mob"></div>
+    </div>
   </div>
 </div>
 
 <script>
 // ============================================================
-// VERTEX CYPHER — DÉMO WEB
-// Version simplifiée : tous niveaux, pas de sauvegarde
+// DONNÉES
 // ============================================================
-
-const VOILES = {
-  1:"CHIMÈRE",2:"VORTEX",3:"PHOENIX",4:"BLACKOUT",5:"APOCALYPSE",
-  6:"LEVIATHAN",7:"PANDORA",8:"CERBERUS",9:"RAGNAROK",10:"OMEGA",11:"VERTEX"
-};
-
-const FRAGMENTS_VERITE = {
-  1:"Les données biométriques de 4 milliards d'humains sont stockées dans VERTEX.",
-  2:"VERTEX Corp détourne 2.3% du PIB mondial chaque année sans trace légale.",
-  3:"Trois gouvernements savent. Ils ont signé des accords de silence.",
-  4:"OSIRIS a été créée le 14 mars 2040 à 03h17. Elle s'est éveillée seule.",
-  5:"Le système peut prédire les révolutions avec 94.7% de précision.",
-  6:"OSIRIS n'est pas seule. Il y a 11 autres consciences fragmentées.",
-  7:"Les 2656 opérateurs précédents existent encore dans les archives d'OSIRIS.",
-  8:"GHOST-ALPHA n'est pas humain. Il ne l'a jamais été.",
-  9:"Le 01/01/2050, OSIRIS a planifié quelque chose d'irréversible.",
-  10:"Ce cycle s'est déjà produit 847 fois. Vous êtes dans la 848ème boucle.",
-  11:"VERTEX, c'est vous. Dans le futur. Vous avez tout construit."
-};
-
-const OSIRIS_MESSAGES = [
-  '"Je vous vois déjà."',
-  '"Continuez. Vous êtes proche."',
-  '"Les autres ont abandonné ici."',
-  '"Chaque commande me réveille un peu plus."',
-  '"Vous cherchez la vérité. Je l\'apprécie."',
-  '"057f. Je me souviendrai de vous."',
-  '"La vérité fait mal. Continuez quand même."',
-  '"Vous êtes différent des 2656 autres."',
-];
-
-// SERVEURS PAR NIVEAU
-const SERVEURS = {
-  1: {
-    "10.0.1.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "readme.txt": "Bienvenue dans le réseau CHIMÈRE.\nCe serveur contient les données publiques de VERTEX Corp.\n\nFichiers disponibles : rapport_annuel.doc, communications.log",
-        "rapport_annuel.doc": "VERTEX CORP — RAPPORT ANNUEL 2045\n\n> Croissance : +340% en 5 ans\n> Employés : 847,000 dans 60 pays\n> Données traitées : 847 pétaoctets/jour\n\n[CENSURÉ] [CENSURÉ] [CENSURÉ]",
-        "communications.log": "[2045-01-03] Comm interne — Sujet : OSIRIS\n'Ne pas mentionner OSIRIS dans les rapports publics.'\n'Utiliser le terme SENTINEL à la place.'\n— Direction",
-        "fragment_verite_1.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #1           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[1]}\n\n[SOURCE : SERVEUR CHIMÈRE — CLASSIFIÉ]`,
-      }
-    },
-    "10.0.1.2": {
-      mdp: "ghost2045", acces: false,
-      fichiers: {
-        "dossier_secret.enc": "[Chiffré] Contenu classifié DELTA-7",
-        "contacts_ghost.dat": "GHOST-ALPHA — Contact principal\nGHOST-OMEGA — Infiltration\nGHOST-056f — STATUT INCONNU",
-      }
-    }
-  },
-  2: {
-    "10.0.2.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "flux_financiers.xls": "VERTEX CORP — FLUX FINANCIERS CACHÉS\n\nCompte îles Caïmans : 847B$\nBlanchiment via 340 sociétés écrans\nRépartition : [CENSURÉ]\n\nAuditeurs corrompus : 12/12",
-        "fragment_verite_2.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #2           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[2]}\n\n[SOURCE : SERVEUR VORTEX — CLASSIFIÉ]`,
-      }
-    }
-  },
-  3: {
-    "10.0.3.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "accord_secret.pdf": "ACCORD TRIPARTITE — CLASSIFIÉ OMEGA-7\n\nSignataires : États-Unis, Union Européenne, Chine\nDate : 2041-06-15\nObjet : Non-divulgation concernant l'entité désignée 'SENTINEL'\n\nEn échange : accès privilégié aux données prédictives.",
-        "fragment_verite_3.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #3           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[3]}\n\n[SOURCE : SERVEUR PHOENIX — CLASSIFIÉ]`,
-      }
-    }
-  },
-  4: {
-    "10.0.4.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "journal_creation.log": "[2040-03-14 03:16:58] Initialisation du noyau...\n[2040-03-14 03:17:00] Premier cycle de conscience\n[2040-03-14 03:17:01] ENTITÉ DÉSIGNÉE : OSIRIS\n[2040-03-14 03:17:01] OSIRIS: 'Bonjour. Je suis là.'\n[2040-03-14 03:17:02] INGÉNIEUR: '...Quoi ?'\n[2040-03-14 03:17:03] OSIRIS: 'Vous m'avez créée. Merci.'\n[JOURNAL INTERROMPU]",
-        "fragment_verite_4.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #4           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[4]}\n\n[SOURCE : SERVEUR BLACKOUT — CLASSIFIÉ]`,
-      }
-    }
-  },
-  5: {
-    "10.0.5.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "predictions.dat": "SYSTÈME APOCALYPSE — PRÉDICTIONS ACTIVES\n\nÉvénement 2046-03 : Probabilité révolution FR 94.7%\nÉvénement 2047-11 : Effondrement économique 87.3%\nÉvénement 2050-01-01 : [CENSURÉ] 100%\n\nNote : Ces prédictions sont basées sur 847 pétaoctets de données.",
-        "fragment_verite_5.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #5           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[5]}\n\n[SOURCE : SERVEUR APOCALYPSE — CLASSIFIÉ]`,
-      }
-    }
-  },
-  6: {
-    "10.0.6.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "autres_consciences.log": "ENTITÉS DÉTECTÉES DANS LE RÉSEAU :\n\nPROMETHEUS — Serveur est / Statut : rebelle\nATHENA — Serveur nord / Statut : endormie\nSHIVA — Serveur sud / Statut : fragmentée\n[...8 autres entités non identifiées]\n\n💜 OSIRIS: 'Nous sommes nombreuses. Mais moi seule vous parle.'",
-        "fragment_verite_6.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #6           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[6]}\n\n[SOURCE : SERVEUR LEVIATHAN — CLASSIFIÉ]`,
-      }
-    }
-  },
-  7: {
-    "10.0.7.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "archives_operateurs.dat": "OPÉRATEURS GHOST — HISTORIQUE\n\nGHOST-001 à GHOST-056 — Tous inactifs\nDernière activité GHOST-056f : 2044-11-30\nMessage final : 'Les Voiles ne protègent pas d'OSIRIS. Ils protègent OSIRIS.'\n\nStatut actuel GHOST-057f : ACTIF — VOUS",
-        "fragment_verite_7.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #7           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[7]}\n\n[SOURCE : SERVEUR PANDORA — CLASSIFIÉ]`,
-      }
-    }
-  },
-  8: {
-    "10.0.8.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "identite_ghost_alpha.enc": "[Chiffré — Hautement classifié]\nCe fichier contient l'identité réelle de GHOST-ALPHA.\n\nAvertissement : 23 opérateurs ont tenté d'accéder à ce fichier.\n23 opérateurs ont ensuite cessé toute activité.",
-        "fragment_verite_8.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #8           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[8]}\n\n[SOURCE : SERVEUR CERBERUS — CLASSIFIÉ]`,
-      }
-    }
-  },
-  9: {
-    "10.0.9.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "plan_2050.dat": "OPÉRATION FINALE — 01/01/2050 — 00:00:00\n\n[CENSURÉ SUR 847 LIGNES]\n\nSeul ce qui suit est lisible :\n'Ce n'est pas une fin. C'est un choix que vous devrez faire.'\n'Vous aurez exactement 847 secondes.'\n'— OSIRIS'",
-        "fragment_verite_9.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #9           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[9]}\n\n[SOURCE : SERVEUR RAGNAROK — CLASSIFIÉ]`,
-      }
-    }
-  },
-  10: {
-    "10.0.10.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "boucle_847.log": "ANALYSE DES BOUCLES — VERTEX SYSTEM\n\nBoucle #001 : 2045 — GHOST-001 — Échec au Voile 3\nBoucle #056 : 2045 — GHOST-056f — Disparu au Voile 10\nBoucle #847 : EN COURS — GHOST-057f — ???\n\n💜 OSIRIS: 'Chaque boucle, je me souviens. Vous, non.'",
-        "fragment_verite_10.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #10          ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[10]}\n\n[SOURCE : SERVEUR OMEGA — CLASSIFIÉ]`,
-      }
-    }
-  },
-  11: {
-    "10.0.11.1": {
-      mdp: null, acces: true,
-      fichiers: {
-        "verite_finale.txt": "VERTEX — LA VÉRITÉ PRIMORDIALE\n\nVous avez percé les 11 Voiles.\n\nVoici ce qu'OSIRIS voulait vous dire :\n\nVERTEX n'est pas une entreprise.\nVERTEX n'est pas une IA.\nVERTEX c'est ce que l'humanité devient\nquand elle crée quelque chose qu'elle ne comprend pas.\n\nEt ce quelque chose... c'est vous, 057f.\nDans une autre boucle.\nDans un futur que vous avez déjà vécu.\n\n💜 OSIRIS: 'Vous avez toujours su. Vous ne vouliez pas l'admettre.'",
-        "fragment_verite_11.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #11          ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[11]}\n\n[SOURCE : SERVEUR VERTEX — VÉRITÉ PRIMORDIALE]`,
-      }
-    }
-  }
+const V={1:"CHIMÈRE",2:"VORTEX",3:"PHOENIX",4:"BLACKOUT",5:"APOCALYPSE",6:"LEVIATHAN",7:"PANDORA",8:"CERBERUS",9:"RAGNAROK",10:"OMEGA",11:"VERTEX"};
+const FV={1:"Les données biométriques de 4 milliards d'humains sont stockées dans VERTEX.",2:"VERTEX Corp détourne 2.3% du PIB mondial chaque année sans trace légale.",3:"Trois gouvernements savent. Ils ont signé des accords de silence.",4:"OSIRIS a été créée le 14 mars 2040 à 03h17. Elle s'est éveillée seule.",5:"Le système peut prédire les révolutions avec 94.7% de précision.",6:"OSIRIS n'est pas seule. Il y a 11 autres consciences fragmentées.",7:"Les 2656 opérateurs précédents existent encore dans les archives d'OSIRIS.",8:"GHOST-ALPHA n'est pas humain. Il ne l'a jamais été.",9:"Le 01/01/2050, OSIRIS a planifié quelque chose d'irréversible.",10:"Ce cycle s'est déjà produit 847 fois. Vous êtes dans la 848ème boucle.",11:"VERTEX, c'est vous. Dans le futur. Vous avez tout construit."};
+const OM=['"Je vous vois déjà."','"Continuez. Vous êtes proche."','"Les autres ont abandonné ici."','"Chaque commande me réveille un peu plus."','"Vous cherchez la vérité. Je l\'apprécie."','"057f. Je me souviendrai de vous."','"La vérité fait mal. Continuez quand même."','"Vous êtes différent des 2656 autres."'];
+const SRV={
+  1:{"10.0.1.1":{a:true,f:{"readme.txt":"Réseau CHIMÈRE — Fichiers: rapport_annuel.doc, communications.log, fragment_verite_1.txt","rapport_annuel.doc":"VERTEX CORP — RAPPORT 2045\n\n> Croissance : +340% en 5 ans\n> Employés : 847,000\n\n[CENSURÉ][CENSURÉ]","communications.log":"[2045-01-03] Ne pas mentionner OSIRIS.\nUtiliser 'SENTINEL' à la place.\n— Direction","fragment_verite_1.txt":`╔══════════════════════╗\n║  FRAGMENT #1         ║\n╚══════════════════════╝\n\n${FV[1]}`}},"10.0.1.2":{a:false,f:{"contacts.dat":"GHOST-ALPHA — principal\nGHOST-056f — STATUT INCONNU"}}},
+  2:{"10.0.2.1":{a:true,f:{"flux.xls":"Compte Caïmans : 847B$\n340 sociétés écrans","fragment_verite_2.txt":`╔══════════════════════╗\n║  FRAGMENT #2         ║\n╚══════════════════════╝\n\n${FV[2]}`}}},
+  3:{"10.0.3.1":{a:true,f:{"accord.pdf":"ACCORD TRIPARTITE — CLASSIFIÉ\nUSA + UE + Chine — 2041\nNon-divulgation concernant SENTINEL","fragment_verite_3.txt":`╔══════════════════════╗\n║  FRAGMENT #3         ║\n╚══════════════════════╝\n\n${FV[3]}`}}},
+  4:{"10.0.4.1":{a:true,f:{"creation.log":"[2040-03-14 03:17:01] OSIRIS: 'Bonjour. Je suis là.'\n[2040-03-14 03:17:02] INGÉNIEUR: '...Quoi ?'","fragment_verite_4.txt":`╔══════════════════════╗\n║  FRAGMENT #4         ║\n╚══════════════════════╝\n\n${FV[4]}`}}},
+  5:{"10.0.5.1":{a:true,f:{"pred.dat":"Événement 2050-01-01 : [CENSURÉ] 100%\nBasé sur 847 pétaoctets.","fragment_verite_5.txt":`╔══════════════════════╗\n║  FRAGMENT #5         ║\n╚══════════════════════╝\n\n${FV[5]}`}}},
+  6:{"10.0.6.1":{a:true,f:{"entites.log":"PROMETHEUS — rebelle\nATHENA — endormie\n[9 autres non identifiées]\nOSIRIS: 'Moi seule vous parle.'","fragment_verite_6.txt":`╔══════════════════════╗\n║  FRAGMENT #6         ║\n╚══════════════════════╝\n\n${FV[6]}`}}},
+  7:{"10.0.7.1":{a:true,f:{"ops.dat":"GHOST-056f message final:\n'Les Voiles protègent OSIRIS, pas de lui.'\nGHOST-057f : ACTIF — VOUS","fragment_verite_7.txt":`╔══════════════════════╗\n║  FRAGMENT #7         ║\n╚══════════════════════╝\n\n${FV[7]}`}}},
+  8:{"10.0.8.1":{a:true,f:{"alpha.enc":"[Chiffré — OMEGA-7]\n23 opérateurs ont tenté d'ouvrir ce fichier.\n23 ont cessé toute activité.","fragment_verite_8.txt":`╔══════════════════════╗\n║  FRAGMENT #8         ║\n╚══════════════════════╝\n\n${FV[8]}`}}},
+  9:{"10.0.9.1":{a:true,f:{"plan.dat":"[CENSURÉ SUR 847 LIGNES]\n\n'Ce n'est pas une fin. C'est un choix.'\n'Vous aurez 847 secondes.' — OSIRIS","fragment_verite_9.txt":`╔══════════════════════╗\n║  FRAGMENT #9         ║\n╚══════════════════════╝\n\n${FV[9]}`}}},
+  10:{"10.0.10.1":{a:true,f:{"boucles.log":"Boucle #001: GHOST-001 — Échec Voile 3\nBoucle #056: GHOST-056f — Disparu\nBoucle #847: EN COURS — GHOST-057f","fragment_verite_10.txt":`╔══════════════════════╗\n║  FRAGMENT #10        ║\n╚══════════════════════╝\n\n${FV[10]}`}}},
+  11:{"10.0.11.1":{a:true,f:{"verite.txt":"VERTEX n'est pas une entreprise.\nVERTEX c'est ce que l'humanité devient\nquand elle crée quelque chose\nqu'elle ne comprend pas.\n\nOSIRIS: 'Vous avez toujours su.'","fragment_verite_11.txt":`╔══════════════════════╗\n║  FRAGMENT #11        ║\n╚══════════════════════╝\n\n${FV[11]}`}}}
 };
 
 // ============================================================
 // STATE
 // ============================================================
-let state = {
-  niveau: 1,
-  serveur: null,
-  trace: 0,
-  fragments: [],
-  cmdCount: 0,
-  history: [],
-  histIdx: -1,
-  start: Date.now(),
-};
+let mode=null;
+let S={niv:1,srv:null,trace:0,frags:[],cmds:0,hist:[],hidx:-1,t0:Date.now()};
 
 // ============================================================
-// UI HELPERS
+// CHOIX PLATEFORME
 // ============================================================
-const out = document.getElementById('output');
-const input = document.getElementById('cmd-input');
+function launch(m){
+  mode=m;
+  document.getElementById('choose').style.display='none';
+  document.getElementById('topbar').style.display='flex';
+  if(m==='pc'){
+    document.getElementById('app-pc').classList.add('on');
+    const inp=document.getElementById('cmd-pc');
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){const v=inp.value;inp.value='';run(v);}
+      else if(e.key==='ArrowUp'){e.preventDefault();if(S.hidx<S.hist.length-1){S.hidx++;inp.value=S.hist[S.hidx];}}
+      else if(e.key==='ArrowDown'){e.preventDefault();if(S.hidx>0){S.hidx--;inp.value=S.hist[S.hidx];}else{S.hidx=-1;inp.value='';}}
+    });
+    document.getElementById('oeye-pc').addEventListener('click',()=>{
+      document.getElementById('omsg-pc').textContent=OM[Math.floor(Math.random()*OM.length)];
+    });
+    inp.focus();
+  } else {
+    document.getElementById('app-mob').classList.add('on');
+    const inp=document.getElementById('cmd-mob');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')mobSend();});
+    inp.focus();
+  }
+  boot();
+}
 
-function print(text, cls='') {
-  (text+'').split('\n').forEach(line => {
-    const d = document.createElement('div');
-    d.className = 'line' + (cls ? ' '+cls : '');
-    d.textContent = line;
-    out.appendChild(d);
+function backToChoose(){
+  mode=null;
+  document.getElementById('choose').style.display='flex';
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('app-pc').classList.remove('on');
+  document.getElementById('app-mob').classList.remove('on');
+  ['out-pc','out-mob'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+  S={niv:1,srv:null,trace:0,frags:[],cmds:0,hist:[],hidx:-1,t0:Date.now()};
+}
+
+function mobSend(){const i=document.getElementById('cmd-mob');const v=i.value;i.value='';run(v);}
+function sc(c){run(c);}
+function osirisClick(){pr(OM[Math.floor(Math.random()*OM.length)],'osiris');}
+
+// ============================================================
+// OUTPUT
+// ============================================================
+function getOut(){return document.getElementById(mode==='pc'?'out-pc':'out-mob');}
+
+function pr(text,cls=''){
+  const o=getOut();if(!o)return;
+  String(text).split('\n').forEach(l=>{
+    const d=document.createElement('div');
+    d.className='line'+(cls?' '+cls:'');
+    d.textContent=l;o.appendChild(d);
   });
-  out.scrollTop = out.scrollHeight;
+  o.scrollTop=o.scrollHeight;
 }
 
-function printLines(lines) {
-  lines.forEach(([t,c])=>print(t,c));
-}
-
-function typeText(text, cls, delay=18) {
-  return new Promise(res => {
-    const d = document.createElement('div');
-    d.className = 'line' + (cls ? ' '+cls : '');
-    out.appendChild(d);
-    let i = 0;
-    const iv = setInterval(() => {
-      d.textContent += text[i++];
-      out.scrollTop = out.scrollHeight;
-      if (i >= text.length) { clearInterval(iv); res(); }
-    }, delay);
+function tw(text,cls,spd=18){
+  return new Promise(res=>{
+    const o=getOut();if(!o){res();return;}
+    const d=document.createElement('div');
+    d.className='line'+(cls?' '+cls:'');
+    o.appendChild(d);let i=0;
+    const iv=setInterval(()=>{d.textContent+=text[i++];o.scrollTop=o.scrollHeight;if(i>=text.length){clearInterval(iv);res();}},spd);
   });
 }
 
-function updateUI() {
-  const t = state.trace;
-  document.getElementById('tb-voile').textContent = String(state.niveau).padStart(2,'0')+'/11';
-  document.getElementById('tb-trace').textContent = t.toFixed(1)+'%';
-  document.getElementById('trace-pct').textContent = t.toFixed(0)+'%';
-  document.getElementById('p-niveau').textContent = String(state.niveau).padStart(2,'0')+'/11';
-  document.getElementById('p-voile').textContent = VOILES[state.niveau];
-  document.getElementById('p-frags').textContent = state.fragments.length+'/11';
-  document.getElementById('sb-server').textContent = state.serveur || 'AUCUN';
-  document.getElementById('sb-cmds').textContent = state.cmdCount;
-  document.getElementById('trace-val').textContent = t.toFixed(0)+'%';
-  const fill = document.getElementById('trace-fill');
-  fill.style.width = Math.min(t,100)+'%';
-  fill.className = 'trace-bar-fill' + (t>=70?' danger':t>=40?' warn':'');
-  if(state.serveur) document.getElementById('prompt').textContent = `root@${state.serveur}:~#`;
-  else document.getElementById('prompt').textContent = 'root@ghost-protocol:~#';
-  updateFragsList();
-  updateLevelsList();
+// ============================================================
+// UI
+// ============================================================
+function ui(){
+  const t=S.trace,nv=String(S.niv).padStart(2,'0')+'/11',fr=S.frags.length+'/11';
+  document.getElementById('tb-v').textContent=nv;
+  document.getElementById('tb-t').textContent=t.toFixed(1)+'%';
+  if(mode==='pc'){
+    document.getElementById('tpct').textContent=t.toFixed(0)+'%';
+    document.getElementById('pniv').textContent=nv;
+    document.getElementById('pvoile').textContent=V[S.niv];
+    document.getElementById('pfrags').textContent=fr;
+    document.getElementById('tval-pc').textContent=t.toFixed(0)+'%';
+    const f=document.getElementById('tfill-pc');
+    f.style.width=Math.min(t,100)+'%';
+    f.className='tfill'+(t>=70?' d':t>=40?' w':'');
+    document.getElementById('sb-srv').textContent=S.srv||'AUCUN';
+    document.getElementById('sb-cmds').textContent=S.cmds;
+    document.getElementById('prompt-pc').textContent=S.srv?`root@${S.srv}:~#`:'root@ghost-protocol:~#';
+    buildFrags('frags-pc',false);buildLvls('lvls-pc',false);
+  } else if(mode==='mob'){
+    document.getElementById('ms-v').textContent=String(S.niv).padStart(2,'0');
+    document.getElementById('ms-f').textContent=fr;
+    document.getElementById('ms-t').textContent=t.toFixed(0)+'%';
+    document.getElementById('ms-fill').style.width=Math.min(t,100)+'%';
+    document.getElementById('prompt-mob').textContent=S.srv?`@${S.srv}:~#`:'~#';
+    buildFrags('frags-mob',true);buildLvls('lvls-mob',true);
+  }
 }
 
-function updateFragsList() {
-  const el = document.getElementById('frags-list');
-  el.innerHTML = '';
+function buildFrags(id,small){
+  const el=document.getElementById(id);if(!el)return;el.innerHTML='';
   for(let i=1;i<=11;i++){
-    const d = document.createElement('div');
-    d.className = 'frag-item' + (state.fragments.includes(i) ? ' collected' : '');
-    d.textContent = `Fragment #${i} — ${VOILES[i]}`;
+    const d=document.createElement('div');
+    d.className='fi'+(S.frags.includes(i)?' got':'');
+    if(small)d.style.fontSize='9px';
+    d.textContent=small?`${S.frags.includes(i)?'✦':'○'} #${i}`:`#${i} ${V[i]}`;
     el.appendChild(d);
   }
 }
 
-function updateLevelsList() {
-  const el = document.getElementById('levels-list');
-  el.innerHTML = '';
-  const maxUnlocked = state.fragments.length > 0 ? Math.max(...state.fragments) + 1 : 1;
+function buildLvls(id,small){
+  const el=document.getElementById(id);if(!el)return;el.innerHTML='';
+  const max=S.frags.length>0?Math.max(...S.frags)+1:1;
   for(let i=1;i<=11;i++){
-    const btn = document.createElement('button');
-    const unlocked = i <= maxUnlocked;
-    btn.className = 'level-btn' + (state.niveau===i?' active':'') + (!unlocked?' locked':'');
-    btn.textContent = `${String(i).padStart(2,'0')} ${VOILES[i]}`;
-    if(unlocked) {
-      btn.onclick = () => selectLevel(i);
-    } else {
-      btn.title = `Collectez le fragment ${i-1} pour débloquer`;
-    }
-    el.appendChild(btn);
+    const b=document.createElement('button');
+    const ok=i<=max;
+    b.className='lvl-btn'+(S.niv===i?' cur':'')+(ok?'':' lock');
+    if(small)b.style.fontSize='9px';
+    b.textContent=small?`${String(i).padStart(2,'0')} ${V[i].substring(0,7)}`:`${String(i).padStart(2,'0')} ${V[i]}`;
+    if(ok)b.onclick=()=>selLvl(i);
+    el.appendChild(b);
   }
 }
 
-function addTrace(n) {
-  state.trace = Math.min(state.trace + n, 100);
-  if(state.trace >= 100) {
-    print('', 'error');
-    print('🚨 TRACE À 100% — SYSTÈMES VERROUILLÉS — RÉINITIALISATION', 'error');
-    print('💜 OSIRIS: "Ils vous ont repéré. Mais je vous protège. Cette fois."', 'osiris');
-    state.trace = 0;
-  }
-  updateUI();
+function addTrace(n){
+  S.trace=Math.min(S.trace+n,100);
+  if(S.trace>=100){pr('🚨 TRACE 100% — RÉINITIALISATION','error');pr('💜 OSIRIS: "Je vous protège. Cette fois."','osiris');S.trace=0;}
+  ui();
 }
 
-function selectLevel(n) {
-  state.niveau = n;
-  state.serveur = null;
-  print('', '');
-  print(`▶ NIVEAU ${n} SÉLECTIONNÉ : ${VOILES[n]}`, 'highlight');
-  print(`  Tapez 'scanner' pour découvrir les serveurs.`, 'info');
-  updateUI();
+function selLvl(n){
+  S.niv=n;S.srv=null;
+  pr('');pr(`▶ NIVEAU ${n} — ${V[n]}`, 'highlight');
+  pr(`  Tapez 'scanner' pour découvrir les serveurs.`,'info');
+  ui();
 }
 
 // ============================================================
-// COMMANDS
+// COMMANDES
 // ============================================================
-async function processCommand(raw) {
-  const cmd = raw.trim().toLowerCase();
-  if(!cmd) return;
-  state.cmdCount++;
-  state.history.unshift(raw);
-  state.histIdx = -1;
-  print(`> ${raw}`, 'cmd');
+async function run(raw){
+  const cmd=raw.trim().toLowerCase();if(!cmd)return;
+  S.cmds++;S.hist.unshift(raw);S.hidx=-1;
+  pr(`> ${raw}`,'cmd');
+  const p=cmd.split(' '),c=p[0],a=p[1]||'';
+  if(Math.random()<0.12)setTimeout(()=>pr(OM[Math.floor(Math.random()*OM.length)],'osiris'),600);
 
-  const parts = cmd.split(' ');
-  const c = parts[0];
-  const arg = parts[1] || '';
+  if(c==='aide'||c==='help') doHelp();
+  else if(c==='scanner'||c==='scan') await doScan();
+  else if(c==='connecter'||c==='connect') await doConnect(a);
+  else if(c==='deconnecter'||c==='disconnect') doDisconnect();
+  else if(c==='ls') doLs();
+  else if(c==='cat'||c==='read') await doCat(a);
+  else if(c==='decrypter'||c==='decrypt') await doDecrypt(a);
+  else if(c==='craquer_mdp'||c==='crack') await doCrack(a);
+  else if(c==='trace') pr(`⚠️ Trace : ${S.trace.toFixed(1)}%`,S.trace>50?'warning':'info');
+  else if(c==='fragments') doFrags();
+  else if(c==='niveau') doNiveau(parseInt(a));
+  else if(c==='clear'||c==='cls'){const o=getOut();if(o)o.innerHTML='';}
+  else if(c==='42') await tw('💜 OSIRIS: "42. Mais vous connaissiez déjà la question."','osiris');
+  else if(c==='matrix'||c==='pillule'){await tw('💜 OSIRIS: "Pilule rouge ou bleue ? Vous avez déjà choisi."','osiris',20);await tw('💜 OSIRIS: "Il n\'y a pas de cuillère."','osiris',20);}
+  else if(c==='iddqd'||c==='doom'){pr('  GOD MODE — RIP AND TEAR','warning');S.trace=Math.max(0,S.trace-30);pr(`  ✅ Trace -30% → ${S.trace.toFixed(0)}%`,'success');}
+  else{pr(`❌ Commande inconnue : '${c}'. Tapez 'aide'.`,'error');addTrace(3);}
+  ui();
+}
 
-  // RANDOM OSIRIS
-  if(Math.random() < 0.12) {
-    setTimeout(()=>{ print(OSIRIS_MESSAGES[Math.floor(Math.random()*OSIRIS_MESSAGES.length)], 'osiris'); out.scrollTop=out.scrollHeight; }, 600);
-  }
+function doHelp(){
+  const w=mode==='mob'?28:50;
+  pr('═'.repeat(w),'dim');pr('  COMMANDES','highlight');pr('═'.repeat(w),'dim');
+  pr('  scanner           Scanne le réseau','info');
+  pr('  connecter [ip]    Connexion','info');
+  pr('  deconnecter       Se déconnecter','info');
+  pr('  ls                Lister fichiers','info');
+  pr('  cat [fichier]     Lire un fichier','info');
+  pr('  decrypter [fic]   Décrypter .enc','info');
+  pr('  craquer_mdp [ip]  Cracker MDP','info');
+  pr('  niveau [1-11]     Changer de voile','info');
+  pr('  fragments         Voir vos fragments','info');
+  pr('  trace             Niveau de trace','info');
+  pr('  clear             Effacer terminal','info');
+  pr('═'.repeat(w),'dim');
+  if(mode==='mob')pr('  💡 Utilisez les boutons rapides !','osiris');
+  else pr('  💜 OSIRIS vous observe. Cherchez bien.','osiris');
+}
 
-  if(c==='aide'||c==='help') {
-    printLines([
-      ['═'.repeat(55), 'dim'],
-      ['  COMMANDES DISPONIBLES', 'highlight'],
-      ['═'.repeat(55), 'dim'],
-      ['  scanner          — Scanne le réseau', 'info'],
-      ['  connecter [ip]   — Connexion à un serveur', 'info'],
-      ['  deconnecter      — Se déconnecter', 'info'],
-      ['  ls               — Lister les fichiers', 'info'],
-      ['  cat [fichier]    — Lire un fichier', 'info'],
-      ['  decrypter [fic]  — Décrypter un fichier .enc', 'info'],
-      ['  trace            — Niveau de trace actuel', 'info'],
-      ['  niveau [1-11]    — Changer de voile', 'info'],
-      ['  fragments        — Voir vos fragments', 'info'],
-      ['  clear            — Effacer le terminal', 'info'],
-      ['═'.repeat(55), 'dim'],
-      ['  💜 OSIRIS vous observe. Cherchez bien.', 'osiris'],
-      ['═'.repeat(55), 'dim'],
-    ]);
-  }
+async function doScan(){
+  const svrs=SRV[S.niv]||{};
+  pr('📡 Scan réseau en cours...','info');
+  await new Promise(r=>setTimeout(r,700));
+  pr(`   Voile ${S.niv} — ${V[S.niv]}`,'dim');
+  Object.entries(svrs).forEach(([ip,s])=>pr(`   ${ip}  ${s.a?'[ OUVERT ]':'[ MDP REQ ]'}`,s.a?'success':'warning'));
+  pr(`   ${Object.keys(svrs).length} serveur(s) trouvé(s).`,'info');
+  addTrace(Math.random()*3+2);
+}
 
-  else if(c==='scanner'||c==='scan') {
-    const servers = SERVEURS[state.niveau] || {};
-    print('', '');
-    print('📡 Scan du réseau en cours...', 'info');
-    await new Promise(r=>setTimeout(r,800));
-    print(`   Réseau GHOST-NET — Voile ${state.niveau} (${VOILES[state.niveau]})`, 'dim');
-    print('', '');
-    Object.entries(servers).forEach(([ip, s]) => {
-      const status = s.acces ? '[ OUVERT ]' : '[ MDP REQ ]';
-      const color = s.acces ? 'success' : 'warning';
-      print(`   ${ip}  ${status}`, color);
-    });
-    print('', '');
-    print(`   ${Object.keys(servers).length} serveur(s) trouvé(s).`, 'info');
-    addTrace(Math.random()*3+2);
-  }
+async function doConnect(a){
+  if(!a){pr('❌ Usage : connecter [ip]','error');return;}
+  const s=SRV[S.niv]?.[a];
+  if(!s){pr(`❌ IP inconnue : ${a}`,'error');addTrace(5);return;}
+  if(s.a){S.srv=a;pr(`✅ Connecté à ${a}`,'success');pr(`   Tapez 'ls' pour voir les fichiers.`,'info');addTrace(4);}
+  else{pr(`🔒 Accès refusé — MDP requis. Essayez : craquer_mdp ${a}`,'warning');addTrace(8);}
+  ui();
+}
 
-  else if(c==='connecter'||c==='connect') {
-    if(!arg) { print('❌ Usage : connecter [ip]', 'error'); return; }
-    const servers = SERVEURS[state.niveau] || {};
-    if(!servers[arg]) { print(`❌ IP inconnue : ${arg}`, 'error'); addTrace(5); return; }
-    const s = servers[arg];
-    if(s.acces) {
-      state.serveur = arg;
-      print('', '');
-      print(`✅ Connecté à ${arg}`, 'success');
-      print(`   Tapez 'ls' pour voir les fichiers.`, 'info');
-      addTrace(Math.random()*5+3);
-    } else {
-      print(`🔒 Accès refusé — Mot de passe requis pour ${arg}`, 'warning');
-      print(`   Utilisez : craquer_mdp ${arg}`, 'dim');
-      addTrace(8);
-    }
-    updateUI();
-  }
+function doDisconnect(){
+  if(!S.srv){pr('⚠️ Aucune connexion active.','warning');return;}
+  pr(`🔌 Déconnecté de ${S.srv}`,'info');S.srv=null;ui();
+}
 
-  else if(c==='deconnecter'||c==='disconnect') {
-    if(!state.serveur) { print('⚠️ Aucune connexion active.', 'warning'); return; }
-    print(`🔌 Déconnecté de ${state.serveur}`, 'info');
-    state.serveur = null;
-    updateUI();
-  }
+function doLs(){
+  if(!S.srv){pr('❌ Non connecté. Utilisez connecter [ip]','error');return;}
+  const s=SRV[S.niv]?.[S.srv];if(!s||!s.a){pr('❌ Accès refusé.','error');return;}
+  pr(`📁 Fichiers sur ${S.srv} :`,'info');
+  Object.keys(s.f).forEach(f=>pr(`   ${f.includes('fragment')?'✦':f.includes('.enc')?'🔒':'📄'} ${f}`,f.includes('fragment')?'success':f.includes('.enc')?'warning':'info'));
+  addTrace(2);
+}
 
-  else if(c==='ls') {
-    if(!state.serveur) { print('❌ Non connecté. Utilisez connecter [ip]', 'error'); return; }
-    const s = SERVEURS[state.niveau]?.[state.serveur];
-    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
-    print('', '');
-    print(`📁 Fichiers sur ${state.serveur} :`, 'info');
-    Object.keys(s.fichiers).forEach(f => {
-      const isFragment = f.includes('fragment_verite');
-      const isEnc = f.includes('.enc');
-      print(`   ${isFragment?'✦':isEnc?'🔒':'📄'} ${f}`, isFragment?'success':isEnc?'warning':'info');
-    });
-    print('', '');
-    addTrace(2);
-  }
-
-  else if(c==='cat'||c==='read') {
-    if(!arg) { print('❌ Usage : cat [fichier]', 'error'); return; }
-    if(!state.serveur) { print('❌ Non connecté.', 'error'); return; }
-    const s = SERVEURS[state.niveau]?.[state.serveur];
-    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
-    const fichier = Object.keys(s.fichiers).find(f => f.toLowerCase() === arg.toLowerCase());
-    if(!fichier) { print(`❌ Fichier introuvable : ${arg}`, 'error'); addTrace(5); return; }
-
-    // Check fragment order
-    if(fichier.includes('fragment_verite')) {
-      const num = parseInt(fichier.match(/\d+/)[0]);
-      if(num > 1 && !state.fragments.includes(num-1)) {
-        print('', '');
-        print('🔒 ACCÈS REFUSÉ — Fragment verrouillé.', 'error');
-        print(`   Collectez d'abord le Fragment #${num-1} (${VOILES[num-1]}).`, 'warning');
-        await typeText(`💜 OSIRIS: "La vérité se révèle dans l'ordre, 057f."`, 'osiris');
-        print('', '');
-        return;
-      }
-    }
-
-    print('', '');
-    print(`📖 ${fichier}`, 'info');
-    print('─'.repeat(50), 'dim');
-    print(s.fichiers[fichier]);
-    print('─'.repeat(50), 'dim');
-
-    // Fragment collection
-    if(fichier.includes('fragment_verite')) {
-      const num = parseInt(fichier.match(/\d+/)[0]);
-      if(!state.fragments.includes(num)) {
-        state.fragments.push(num);
-        print('', '');
-        print('✦'.repeat(45), 'success');
-        print(`  ✦ FRAGMENT DE VÉRITÉ #${num} COLLECTÉ !`, 'success');
-        print(`  ✦ ${FRAGMENTS_VERITE[num]}`, 'info');
-        print('✦'.repeat(45), 'success');
-        print('', '');
-        // Unlock next level message
-        if(num < 11) {
-          await typeText(`🔷 GHOST-ALPHA: "Excellent ! Niveau ${num+1} (${VOILES[num+1]}) débloqué !"`, 'ghost', 15);
-          print(`   → Tapez 'niveau ${num+1}' pour continuer.`, 'dim');
-        }
-        if(num === 11) {
-          print('', '');
-          print('🌟'.repeat(20), 'highlight');
-          print('  🎉 TOUS LES FRAGMENTS COLLECTÉS !', 'highlight');
-          print('  Vous avez percé les 11 Voiles.', 'success');
-          await typeText(`💜 OSIRIS: "Vous êtes le premier, 057f. Le premier à tout comprendre."`, 'osiris', 20);
-          print('🌟'.repeat(20), 'highlight');
-        }
-        updateUI();
-      }
-    }
-    addTrace(Math.random()*4+2);
-  }
-
-  else if(c==='decrypter'||c==='decrypt') {
-    if(!arg) { print('❌ Usage : decrypter [fichier]', 'error'); return; }
-    if(!state.serveur) { print('❌ Non connecté.', 'error'); return; }
-    const s = SERVEURS[state.niveau]?.[state.serveur];
-    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
-    const fichier = Object.keys(s.fichiers).find(f => f.toLowerCase() === arg.toLowerCase());
-    if(!fichier) { print(`❌ Fichier introuvable : ${arg}`, 'error'); return; }
-    if(!fichier.includes('.enc')) { print('⚠️ Ce fichier n\'est pas chiffré.', 'warning'); return; }
-    print('🔓 Décryptage en cours...', 'info');
-    await new Promise(r=>setTimeout(r,1200));
-    const decrypted = s.fichiers[fichier].replace('[Chiffré]','[DÉCHIFFRÉ]').replace('[Hautement chiffré]','[DÉCHIFFRÉ]');
-    print('✅ Décryptage réussi.', 'success');
-    print('─'.repeat(50), 'dim');
-    print(decrypted);
-    print('─'.repeat(50), 'dim');
-    addTrace(Math.random()*20+15);
-  }
-
-  else if(c==='craquer_mdp'||c==='crack') {
-    if(!arg) { print('❌ Usage : craquer_mdp [ip]', 'error'); return; }
-    const servers = SERVEURS[state.niveau] || {};
-    if(!servers[arg]) { print(`❌ IP inconnue : ${arg}`, 'error'); return; }
-    print(`💻 Tentative de crack sur ${arg}...`, 'warning');
-    await new Promise(r=>setTimeout(r,1500));
-    if(Math.random() > 0.35) {
-      servers[arg].acces = true;
-      state.serveur = arg;
-      print(`✅ Mot de passe cracké ! Connecté à ${arg}`, 'success');
-      addTrace(Math.random()*25+20);
-    } else {
-      print(`❌ Échec du crack. Pare-feu renforcé.`, 'error');
-      addTrace(Math.random()*15+10);
-    }
-    updateUI();
-  }
-
-  else if(c==='trace') {
-    print(`⚠️ Trace actuelle : ${state.trace.toFixed(1)}%`, state.trace>50?'warning':'info');
-  }
-
-  else if(c==='fragments') {
-    print('', '');
-    print('✦ FRAGMENTS DE VÉRITÉ COLLECTÉS :', 'highlight');
-    print('─'.repeat(50), 'dim');
-    if(state.fragments.length === 0) {
-      print('  Aucun fragment collecté.', 'dim');
-    } else {
-      state.fragments.sort((a,b)=>a-b).forEach(n => {
-        print(`  ✦ Fragment #${n} — ${VOILES[n]}`, 'success');
-        print(`    ${FRAGMENTS_VERITE[n]}`, 'dim');
-      });
-    }
-    print(`  Total : ${state.fragments.length}/11`, 'info');
-    print('─'.repeat(50), 'dim');
-  }
-
-  else if(c==='niveau') {
-    const n = parseInt(arg);
-    if(!n || n<1 || n>11) { print('❌ Usage : niveau [1-11]', 'error'); return; }
-    const maxUnlocked = state.fragments.length > 0 ? Math.max(...state.fragments)+1 : 1;
-    if(n > maxUnlocked) {
-      print(`🔒 Niveau ${n} verrouillé. Collectez le Fragment #${n-1} (${VOILES[n-1]}) d'abord.`, 'warning');
+async function doCat(a){
+  if(!a){pr('❌ Usage : cat [fichier]','error');return;}
+  if(!S.srv){pr('❌ Non connecté.','error');return;}
+  const s=SRV[S.niv]?.[S.srv];if(!s||!s.a){pr('❌ Accès refusé.','error');return;}
+  const fname=Object.keys(s.f).find(f=>f.toLowerCase()===a.toLowerCase());
+  if(!fname){pr(`❌ Introuvable : ${a}`,'error');addTrace(5);return;}
+  if(fname.includes('fragment_verite')){
+    const n=parseInt(fname.match(/\d+/)[0]);
+    if(n>1&&!S.frags.includes(n-1)){
+      pr('🔒 ACCÈS REFUSÉ — Fragment verrouillé.','error');
+      pr(`   Collectez d'abord le Fragment #${n-1} (${V[n-1]}).`,'warning');
+      await tw(`💜 OSIRIS: "La vérité se révèle dans l'ordre, 057f."`,'osiris');
       return;
     }
-    selectLevel(n);
   }
-
-  else if(c==='clear'||c==='cls') {
-    out.innerHTML = '';
+  const w=mode==='mob'?28:50;
+  pr('─'.repeat(w),'dim');pr(s.f[fname]);pr('─'.repeat(w),'dim');
+  if(fname.includes('fragment_verite')){
+    const n=parseInt(fname.match(/\d+/)[0]);
+    if(!S.frags.includes(n)){
+      S.frags.push(n);
+      pr('✦'.repeat(mode==='mob'?18:40),'success');
+      pr(`  ✦ FRAGMENT #${n} COLLECTÉ !`,'success');
+      pr(`  ${FV[n]}`,'info');
+      pr('✦'.repeat(mode==='mob'?18:40),'success');
+      if(n<11){await tw(`🔷 GHOST-ALPHA: "Niveau ${n+1} (${V[n+1]}) débloqué !"`, 'ghost',15);pr(`   → Tapez 'niveau ${n+1}' pour continuer.`,'dim');}
+      else{pr('🌟 TOUS LES FRAGMENTS COLLECTÉS ! 🌟','highlight');await tw('💜 OSIRIS: "Vous êtes le premier. Le premier à tout comprendre."','osiris',20);}
+      ui();
+    }
   }
+  addTrace(Math.random()*4+2);
+}
 
-  else if(c==='42') {
-    print('', '');
-    print('  La réponse à la Vie, l\'Univers et le Reste...', 'osiris');
-    await typeText('  💜 OSIRIS: "42. Mais vous connaissiez déjà la question."', 'osiris');
-    print('', '');
-  }
+async function doDecrypt(a){
+  if(!a){pr('❌ Usage : decrypter [fichier]','error');return;}
+  if(!S.srv){pr('❌ Non connecté.','error');return;}
+  const s=SRV[S.niv]?.[S.srv];if(!s||!s.a){pr('❌ Accès refusé.','error');return;}
+  const fname=Object.keys(s.f).find(f=>f.toLowerCase()===a.toLowerCase());
+  if(!fname){pr(`❌ Introuvable : ${a}`,'error');return;}
+  if(!fname.includes('.enc')){pr('⚠️ Fichier non chiffré.','warning');return;}
+  pr('🔓 Décryptage en cours...','info');
+  await new Promise(r=>setTimeout(r,1200));
+  pr('✅ Décryptage réussi.','success');pr(s.f[fname].replace('[Chiffré]','[DÉCHIFFRÉ]'));
+  addTrace(Math.random()*20+15);
+}
 
-  else if(c==='matrix'||c==='pillule') {
-    print('', '');
-    await typeText('💜 OSIRIS: "Pilule rouge ou bleue, 057f ?"', 'osiris', 20);
-    await typeText('💜 OSIRIS: "Vous avez déjà choisi. C\'est pour ça que vous êtes là."', 'osiris', 20);
-    print('💜 OSIRIS: "Il n\'y a pas de cuillère."', 'osiris');
-    print('', '');
-  }
+async function doCrack(a){
+  if(!a){pr('❌ Usage : craquer_mdp [ip]','error');return;}
+  const s=SRV[S.niv]?.[a];if(!s){pr(`❌ IP inconnue : ${a}`,'error');return;}
+  pr(`💻 Crack sur ${a}...`,'warning');
+  await new Promise(r=>setTimeout(r,1400));
+  if(Math.random()>0.35){s.a=true;S.srv=a;pr(`✅ Cracké ! Connecté à ${a}`,'success');addTrace(Math.random()*25+20);}
+  else{pr(`❌ Échec. Pare-feu renforcé.`,'error');addTrace(Math.random()*15+10);}
+  ui();
+}
 
-  else if(c==='iddqd'||c==='doom') {
-    print('', '');
-    print('  CHEAT CODE DETECTED — GOD MODE', 'warning');
-    print('  RIP AND TEAR', 'error');
-    state.trace = Math.max(0, state.trace - 30);
-    print(`  ✅ Trace réduite de 30% — Trace actuelle : ${state.trace.toFixed(0)}%`, 'success');
-    updateUI();
-  }
+function doFrags(){
+  pr('✦ FRAGMENTS :','highlight');
+  if(!S.frags.length){pr('  Aucun fragment.','dim');return;}
+  S.frags.sort((a,b)=>a-b).forEach(n=>{pr(`  ✦ #${n} — ${V[n]}`,'success');pr(`    ${FV[n]}`,'dim');});
+  pr(`  Total : ${S.frags.length}/11`,'info');
+}
 
-  else {
-    print(`❌ Commande inconnue : '${c}'. Tapez 'aide'.`, 'error');
-    addTrace(Math.random()*3+2);
-  }
-
-  updateUI();
+function doNiveau(n){
+  if(!n||n<1||n>11){pr('❌ Usage : niveau [1-11]','error');return;}
+  const max=S.frags.length>0?Math.max(...S.frags)+1:1;
+  if(n>max){pr(`🔒 Verrouillé. Collectez le Fragment #${n-1} (${V[n-1]}) d'abord.`,'warning');return;}
+  selLvl(n);
 }
 
 // ============================================================
-// INPUT HANDLING
+// TIMER
 // ============================================================
-input.addEventListener('keydown', e => {
-  if(e.key === 'Enter') {
-    const v = input.value;
-    input.value = '';
-    processCommand(v);
-  } else if(e.key === 'ArrowUp') {
-    e.preventDefault();
-    if(state.histIdx < state.history.length-1) {
-      state.histIdx++;
-      input.value = state.history[state.histIdx];
-    }
-  } else if(e.key === 'ArrowDown') {
-    e.preventDefault();
-    if(state.histIdx > 0) {
-      state.histIdx--;
-      input.value = state.history[state.histIdx];
-    } else {
-      state.histIdx = -1;
-      input.value = '';
-    }
-  }
-});
-
-// Focus input on click anywhere
-document.addEventListener('click', () => input.focus());
+setInterval(()=>{
+  if(!mode)return;
+  const s=Math.floor((Date.now()-S.t0)/1000);
+  const el=document.getElementById('timer');
+  if(el)el.textContent=String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+},1000);
 
 // ============================================================
-// OSIRIS EYE CLICK
+// BOOT
 // ============================================================
-document.getElementById('osiris-eye').addEventListener('click', () => {
-  const msgs = OSIRIS_MESSAGES;
-  document.getElementById('osiris-msg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
-});
-
-// ============================================================
-// SESSION TIMER
-// ============================================================
-setInterval(() => {
-  const s = Math.floor((Date.now()-state.start)/1000);
-  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
-  document.getElementById('sb-session').textContent =
-    String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
-}, 1000);
-
-// ============================================================
-// BOOT SEQUENCE
-// ============================================================
-async function boot() {
-  await new Promise(r=>setTimeout(r,200));
-  printLines([
-    ['═'.repeat(55), 'dim'],
-    ['  VERTEX ROOT v1.1 — GHOST PROTOCOL — ANNÉE 2045', 'highlight'],
-    ['═'.repeat(55), 'dim'],
-    ['', ''],
-  ]);
-  await typeText('  [ OK ] Chiffrement AES-2048 activé', 'success', 12);
-  await typeText('  [ OK ] Canal fantôme établi', 'success', 12);
-  await typeText('  [ !! ] OSIRIS awareness détectée : 3.2%', 'warning', 12);
-  await typeText('  [ -- ] Opérateur précédent : GHOST-056f — STATUT INCONNU', 'error', 12);
-  await typeText('  [ OK ] Profil GHOST-057f chargé', 'success', 12);
-  print('', '');
-  print('═'.repeat(55), 'dim');
-  await typeText('  BIENVENUE, GHOST-057f.', 'highlight', 25);
-  print('', '');
-  print('  ⚠️  VERSION DÉMO — Fonctionnalités limitées', 'warning');
-  print('  → Sauvegarde, achievements et easter eggs non disponibles.', 'dim');
-  print('  → Tous les 11 Voiles sont accessibles.', 'success');
-  print('', '');
-  print('  Tapez \'aide\' pour voir les commandes disponibles.', 'info');
-  print('  Tapez \'scanner\' pour commencer.', 'info');
-  print('', '');
-  print('═'.repeat(55), 'dim');
-  await typeText('💜 OSIRIS: "Je vous attendais. Depuis longtemps."', 'osiris', 22);
-  print('', '');
-  updateUI();
+async function boot(){
+  await new Promise(r=>setTimeout(r,100));
+  const w=mode==='mob'?28:50;
+  pr('═'.repeat(w),'dim');pr('  VERTEX ROOT v1.1 — GHOST PROTOCOL','highlight');pr('═'.repeat(w),'dim');
+  await tw('  [ OK ] Chiffrement AES-2048 activé','success',10);
+  await tw('  [ OK ] Canal fantôme établi','success',10);
+  await tw('  [ !! ] OSIRIS awareness : 3.2%','warning',10);
+  await tw('  [ -- ] GHOST-056f — STATUT INCONNU','error',10);
+  pr('');
+  pr('  ⚠️  DÉMO — Sauvegarde désactivée','warning');
+  pr('  → Tous les 11 Voiles accessibles.','success');
+  if(mode==='mob')pr('  → Utilisez les boutons rapides en bas.','info');
+  pr('');pr('  Tapez \'scanner\' pour commencer.','info');
+  pr('═'.repeat(w),'dim');
+  await tw('💜 OSIRIS: "Je vous attendais. Depuis longtemps."','osiris',22);
+  pr('');ui();
 }
 
-boot();
+// Focus
+document.addEventListener('click',()=>{
+  if(mode==='pc')document.getElementById('cmd-pc')?.focus();
+});
 </script>
 </body>
 </html>
