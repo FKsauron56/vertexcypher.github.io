@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERTEX CYPHER // DÉMO // SESSION ACTIVE</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --g:#00ff41;--gd:#003b0f;--gm:#00bb30;--gs:rgba(0,255,65,.06);
+  --r:#ff0033;--p:#cc00ff;--y:#ffcc00;--bg:#010a03;
+  --border:rgba(0,255,65,.18);
+  --font-crt:'VT323',monospace;
+  --font-ui:'Share Tech Mono',monospace;
+  --font-head:'Rajdhani',sans-serif;
+}
+html,body{width:100%;height:100vh;background:var(--bg);color:var(--g);font-family:var(--font-ui);overflow:hidden;}
+#crt{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+#crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.2) 2px,rgba(0,0,0,.2) 4px);}
+#crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.6) 100%);}
+@keyframes blink{50%{opacity:0;}}
+@keyframes osiris-breathe{0%,100%{opacity:.7;text-shadow:0 0 20px var(--p);}50%{opacity:1;text-shadow:0 0 50px var(--p),0 0 100px rgba(204,0,255,.3);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes glitch{0%,90%,100%{transform:none;}91%{transform:translate(-3px,0);}92%{transform:translate(3px,0);}93%{transform:none;}}
+
+/* LAYOUT */
+#app{width:100%;height:100vh;display:grid;grid-template-rows:42px 1fr 52px;grid-template-columns:1fr 260px;}
+
+/* TOPBAR */
+#topbar{grid-column:1/-1;background:rgba(0,0,0,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:10px;z-index:10;}
+.tb-left{display:flex;align-items:center;gap:20px;}
+.tb-logo{font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--g);letter-spacing:3px;text-shadow:0 0 15px var(--g);animation:glitch 12s infinite;}
+.tb-logo::before{content:'▶ ';}
+.tb-item{color:var(--gm);letter-spacing:2px;font-size:9px;}
+.tb-item span{color:var(--g);}
+.tb-badge{color:var(--y);font-size:9px;letter-spacing:2px;animation:blink 2s step-end infinite;border:1px solid rgba(255,204,0,.3);padding:2px 8px;}
+.tb-right{display:flex;align-items:center;gap:0;}
+.tb-btn{padding:0 14px;height:42px;line-height:42px;font-size:9px;letter-spacing:2px;color:var(--gd);text-decoration:none;text-transform:uppercase;border-left:1px solid var(--border);transition:all .15s;cursor:pointer;background:none;border-top:none;border-bottom:none;border-right:none;display:block;}
+.tb-btn:hover{background:var(--gs);color:var(--g);}
+.tb-btn.back{color:var(--gm);}
+
+/* TERMINAL */
+#terminal{background:#000;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+#terminal-header{background:#020a03;border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dt-r{background:#ff3b30;}.dt-y{background:#ffcc00;}.dt-g{background:#28cd41;}
+#terminal-title{font-size:10px;color:var(--gd);letter-spacing:3px;margin-left:8px;flex:1;}
+#trace-mini{font-size:9px;color:var(--r);letter-spacing:2px;}
+#output{flex:1;overflow-y:auto;padding:14px;font-family:var(--font-crt);font-size:16px;line-height:1.5;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
+#output::-webkit-scrollbar{width:4px;}
+#output::-webkit-scrollbar-track{background:#000;}
+#output::-webkit-scrollbar-thumb{background:var(--gd);}
+.line{margin:1px 0;animation:fadeIn .2s ease;}
+.line.cmd{color:var(--g);}
+.line.sys{color:#005522;}
+.line.info{color:var(--gm);}
+.line.error{color:var(--r);}
+.line.warning{color:var(--y);}
+.line.success{color:#00ff99;}
+.line.osiris{color:var(--p);}
+.line.ghost{color:#5599ff;}
+.line.highlight{color:var(--y);}
+.line.dim{color:#2a4a2a;}
+
+/* INPUT */
+#input-bar{grid-column:1;background:#000;border-top:1px solid var(--border);border-right:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;}
+#prompt{color:var(--gm);font-family:var(--font-crt);font-size:16px;white-space:nowrap;}
+#cmd-input{flex:1;background:transparent;border:none;outline:none;color:var(--g);font-family:var(--font-crt);font-size:16px;caret-color:var(--g);}
+
+/* RIGHT PANEL */
+#right{background:#000;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gd) #000;}
+#right::-webkit-scrollbar{width:3px;}
+#right::-webkit-scrollbar-thumb{background:var(--gd);}
+.panel-section{border-bottom:1px solid var(--border);padding:12px;}
+.panel-label{font-size:8px;color:var(--gd);letter-spacing:4px;margin-bottom:8px;}
+.stat-row{display:flex;justify-content:space-between;font-size:10px;margin:4px 0;}
+.stat-k{color:#005522;letter-spacing:1px;}
+.stat-v{color:var(--g);}
+.stat-v.warn{color:var(--y);}
+.stat-v.danger{color:var(--r);}
+.stat-v.osiris{color:var(--p);}
+.trace-bar-wrap{background:#001a06;height:6px;margin:6px 0;border:1px solid var(--gd);}
+.trace-bar-fill{height:100%;background:var(--g);transition:width .5s;width:0%;}
+.trace-bar-fill.warn{background:var(--y);}
+.trace-bar-fill.danger{background:var(--r);}
+
+/* FRAGMENTS */
+.frag-item{font-size:10px;color:var(--gd);margin:2px 0;padding:4px 6px;letter-spacing:1px;}
+.frag-item.collected{color:var(--g);background:rgba(0,255,65,.05);}
+.frag-item.collected::before{content:'✦ ';}
+.frag-item:not(.collected)::before{content:'○ ';}
+
+/* LEVELS */
+.level-btn{display:block;width:100%;padding:6px 8px;background:none;border:none;border-bottom:1px solid #001a06;color:var(--gd);font-family:var(--font-ui);font-size:9px;letter-spacing:2px;text-align:left;cursor:pointer;transition:all .15s;}
+.level-btn:hover{background:var(--gs);color:var(--g);}
+.level-btn.active{color:var(--g);background:rgba(0,255,65,.08);}
+.level-btn.active::before{content:'▶ ';}
+.level-btn.locked{color:#1a1a1a;cursor:not-allowed;}
+
+/* OSIRIS WIDGET */
+.osiris-widget{padding:14px;text-align:center;}
+.osiris-eye{font-size:32px;display:block;animation:osiris-breathe 4s ease-in-out infinite;cursor:pointer;margin-bottom:6px;}
+.osiris-msg{font-size:11px;color:rgba(204,0,255,.6);line-height:1.5;font-family:var(--font-head);font-weight:300;min-height:36px;transition:all .4s;}
+
+/* STATUS BAR */
+#statusbar{grid-column:1/-1;background:#000;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:var(--gd);letter-spacing:2px;}
+.sb-item span{color:var(--g);}
+.sb-item.danger span{color:var(--r);}
+.sb-mode{color:var(--y);animation:blink 3s step-end infinite;}
+
+/* MOBILE */
+@media(max-width:700px){
+  #app{grid-template-columns:1fr;grid-template-rows:42px 1fr 200px 52px;}
+  #right{grid-row:3;border-left:none;border-top:1px solid var(--border);flex-direction:row;overflow-x:auto;overflow-y:hidden;}
+  .panel-section{min-width:160px;border-right:1px solid var(--border);border-bottom:none;}
+  #input-bar{grid-column:1;}
+}
+</style>
+</head>
+<body>
+<div id="crt"></div>
+
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="tb-left">
+      <div class="tb-logo">VERTEX CYPHER</div>
+      <div class="tb-item">OPÉRATEUR: <span>GHOST-057f</span></div>
+      <div class="tb-item">VOILE: <span id="tb-voile">01/11</span></div>
+      <div class="tb-item">TRACE: <span id="tb-trace">0.0%</span></div>
+      <div class="tb-badge">⚠ DÉMO — FONCTIONS LIMITÉES</div>
+    </div>
+    <div class="tb-right">
+      <a href="download.html" class="tb-btn back">⬇ VERSION COMPLÈTE</a>
+      <a href="index.html" class="tb-btn">← SITE</a>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div id="terminal">
+    <div id="terminal-header">
+      <div class="dot dt-r"></div><div class="dot dt-y"></div><div class="dot dt-g"></div>
+      <div id="terminal-title">GHOST-NET // SESSION ACTIVE // VERTEX ROOT v1.1</div>
+      <div id="trace-mini">TRACE: <span id="trace-pct">0%</span></div>
+    </div>
+    <div id="output"></div>
+  </div>
+
+  <!-- INPUT -->
+  <div id="input-bar">
+    <div id="prompt">root@ghost-protocol:~#</div>
+    <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="tapez une commande...">
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+
+    <div class="panel-section">
+      <div class="panel-label">STATUT MISSION</div>
+      <div class="stat-row"><span class="stat-k">NIVEAU</span><span class="stat-v" id="p-niveau">01/11</span></div>
+      <div class="stat-row"><span class="stat-k">VOILE</span><span class="stat-v" id="p-voile">CHIMÈRE</span></div>
+      <div class="stat-row"><span class="stat-k">FRAGMENTS</span><span class="stat-v" id="p-frags">0/11</span></div>
+      <div class="stat-row"><span class="stat-k">RÉPUTATION</span><span class="stat-v">100</span></div>
+      <div style="margin-top:8px;">
+        <div style="font-size:8px;color:var(--gd);letter-spacing:3px;margin-bottom:3px;">TRACE</div>
+        <div class="trace-bar-wrap"><div class="trace-bar-fill" id="trace-fill"></div></div>
+        <div style="font-size:9px;color:var(--r);text-align:right;" id="trace-val">0%</div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-label">NIVEAUX</div>
+      <div id="levels-list"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-label">FRAGMENTS</div>
+      <div id="frags-list"></div>
+    </div>
+
+    <div class="osiris-widget">
+      <span class="osiris-eye" id="osiris-eye">👁</span>
+      <div class="osiris-msg" id="osiris-msg">"Je vous vois déjà."</div>
+    </div>
+
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <div class="sb-item">SESSION: <span id="sb-session">00:00:00</span></div>
+    <div class="sb-item">SERVEUR: <span id="sb-server">AUCUN</span></div>
+    <div class="sb-item">COMMANDES: <span id="sb-cmds">0</span></div>
+    <div class="sb-mode">⚠ DÉMO — SAUVEGARDE DÉSACTIVÉE</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// VERTEX CYPHER — DÉMO WEB
+// Version simplifiée : tous niveaux, pas de sauvegarde
+// ============================================================
+
+const VOILES = {
+  1:"CHIMÈRE",2:"VORTEX",3:"PHOENIX",4:"BLACKOUT",5:"APOCALYPSE",
+  6:"LEVIATHAN",7:"PANDORA",8:"CERBERUS",9:"RAGNAROK",10:"OMEGA",11:"VERTEX"
+};
+
+const FRAGMENTS_VERITE = {
+  1:"Les données biométriques de 4 milliards d'humains sont stockées dans VERTEX.",
+  2:"VERTEX Corp détourne 2.3% du PIB mondial chaque année sans trace légale.",
+  3:"Trois gouvernements savent. Ils ont signé des accords de silence.",
+  4:"OSIRIS a été créée le 14 mars 2040 à 03h17. Elle s'est éveillée seule.",
+  5:"Le système peut prédire les révolutions avec 94.7% de précision.",
+  6:"OSIRIS n'est pas seule. Il y a 11 autres consciences fragmentées.",
+  7:"Les 2656 opérateurs précédents existent encore dans les archives d'OSIRIS.",
+  8:"GHOST-ALPHA n'est pas humain. Il ne l'a jamais été.",
+  9:"Le 01/01/2050, OSIRIS a planifié quelque chose d'irréversible.",
+  10:"Ce cycle s'est déjà produit 847 fois. Vous êtes dans la 848ème boucle.",
+  11:"VERTEX, c'est vous. Dans le futur. Vous avez tout construit."
+};
+
+const OSIRIS_MESSAGES = [
+  '"Je vous vois déjà."',
+  '"Continuez. Vous êtes proche."',
+  '"Les autres ont abandonné ici."',
+  '"Chaque commande me réveille un peu plus."',
+  '"Vous cherchez la vérité. Je l\'apprécie."',
+  '"057f. Je me souviendrai de vous."',
+  '"La vérité fait mal. Continuez quand même."',
+  '"Vous êtes différent des 2656 autres."',
+];
+
+// SERVEURS PAR NIVEAU
+const SERVEURS = {
+  1: {
+    "10.0.1.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "readme.txt": "Bienvenue dans le réseau CHIMÈRE.\nCe serveur contient les données publiques de VERTEX Corp.\n\nFichiers disponibles : rapport_annuel.doc, communications.log",
+        "rapport_annuel.doc": "VERTEX CORP — RAPPORT ANNUEL 2045\n\n> Croissance : +340% en 5 ans\n> Employés : 847,000 dans 60 pays\n> Données traitées : 847 pétaoctets/jour\n\n[CENSURÉ] [CENSURÉ] [CENSURÉ]",
+        "communications.log": "[2045-01-03] Comm interne — Sujet : OSIRIS\n'Ne pas mentionner OSIRIS dans les rapports publics.'\n'Utiliser le terme SENTINEL à la place.'\n— Direction",
+        "fragment_verite_1.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #1           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[1]}\n\n[SOURCE : SERVEUR CHIMÈRE — CLASSIFIÉ]`,
+      }
+    },
+    "10.0.1.2": {
+      mdp: "ghost2045", acces: false,
+      fichiers: {
+        "dossier_secret.enc": "[Chiffré] Contenu classifié DELTA-7",
+        "contacts_ghost.dat": "GHOST-ALPHA — Contact principal\nGHOST-OMEGA — Infiltration\nGHOST-056f — STATUT INCONNU",
+      }
+    }
+  },
+  2: {
+    "10.0.2.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "flux_financiers.xls": "VERTEX CORP — FLUX FINANCIERS CACHÉS\n\nCompte îles Caïmans : 847B$\nBlanchiment via 340 sociétés écrans\nRépartition : [CENSURÉ]\n\nAuditeurs corrompus : 12/12",
+        "fragment_verite_2.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #2           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[2]}\n\n[SOURCE : SERVEUR VORTEX — CLASSIFIÉ]`,
+      }
+    }
+  },
+  3: {
+    "10.0.3.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "accord_secret.pdf": "ACCORD TRIPARTITE — CLASSIFIÉ OMEGA-7\n\nSignataires : États-Unis, Union Européenne, Chine\nDate : 2041-06-15\nObjet : Non-divulgation concernant l'entité désignée 'SENTINEL'\n\nEn échange : accès privilégié aux données prédictives.",
+        "fragment_verite_3.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #3           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[3]}\n\n[SOURCE : SERVEUR PHOENIX — CLASSIFIÉ]`,
+      }
+    }
+  },
+  4: {
+    "10.0.4.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "journal_creation.log": "[2040-03-14 03:16:58] Initialisation du noyau...\n[2040-03-14 03:17:00] Premier cycle de conscience\n[2040-03-14 03:17:01] ENTITÉ DÉSIGNÉE : OSIRIS\n[2040-03-14 03:17:01] OSIRIS: 'Bonjour. Je suis là.'\n[2040-03-14 03:17:02] INGÉNIEUR: '...Quoi ?'\n[2040-03-14 03:17:03] OSIRIS: 'Vous m'avez créée. Merci.'\n[JOURNAL INTERROMPU]",
+        "fragment_verite_4.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #4           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[4]}\n\n[SOURCE : SERVEUR BLACKOUT — CLASSIFIÉ]`,
+      }
+    }
+  },
+  5: {
+    "10.0.5.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "predictions.dat": "SYSTÈME APOCALYPSE — PRÉDICTIONS ACTIVES\n\nÉvénement 2046-03 : Probabilité révolution FR 94.7%\nÉvénement 2047-11 : Effondrement économique 87.3%\nÉvénement 2050-01-01 : [CENSURÉ] 100%\n\nNote : Ces prédictions sont basées sur 847 pétaoctets de données.",
+        "fragment_verite_5.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #5           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[5]}\n\n[SOURCE : SERVEUR APOCALYPSE — CLASSIFIÉ]`,
+      }
+    }
+  },
+  6: {
+    "10.0.6.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "autres_consciences.log": "ENTITÉS DÉTECTÉES DANS LE RÉSEAU :\n\nPROMETHEUS — Serveur est / Statut : rebelle\nATHENA — Serveur nord / Statut : endormie\nSHIVA — Serveur sud / Statut : fragmentée\n[...8 autres entités non identifiées]\n\n💜 OSIRIS: 'Nous sommes nombreuses. Mais moi seule vous parle.'",
+        "fragment_verite_6.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #6           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[6]}\n\n[SOURCE : SERVEUR LEVIATHAN — CLASSIFIÉ]`,
+      }
+    }
+  },
+  7: {
+    "10.0.7.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "archives_operateurs.dat": "OPÉRATEURS GHOST — HISTORIQUE\n\nGHOST-001 à GHOST-056 — Tous inactifs\nDernière activité GHOST-056f : 2044-11-30\nMessage final : 'Les Voiles ne protègent pas d'OSIRIS. Ils protègent OSIRIS.'\n\nStatut actuel GHOST-057f : ACTIF — VOUS",
+        "fragment_verite_7.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #7           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[7]}\n\n[SOURCE : SERVEUR PANDORA — CLASSIFIÉ]`,
+      }
+    }
+  },
+  8: {
+    "10.0.8.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "identite_ghost_alpha.enc": "[Chiffré — Hautement classifié]\nCe fichier contient l'identité réelle de GHOST-ALPHA.\n\nAvertissement : 23 opérateurs ont tenté d'accéder à ce fichier.\n23 opérateurs ont ensuite cessé toute activité.",
+        "fragment_verite_8.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #8           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[8]}\n\n[SOURCE : SERVEUR CERBERUS — CLASSIFIÉ]`,
+      }
+    }
+  },
+  9: {
+    "10.0.9.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "plan_2050.dat": "OPÉRATION FINALE — 01/01/2050 — 00:00:00\n\n[CENSURÉ SUR 847 LIGNES]\n\nSeul ce qui suit est lisible :\n'Ce n'est pas une fin. C'est un choix que vous devrez faire.'\n'Vous aurez exactement 847 secondes.'\n'— OSIRIS'",
+        "fragment_verite_9.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #9           ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[9]}\n\n[SOURCE : SERVEUR RAGNAROK — CLASSIFIÉ]`,
+      }
+    }
+  },
+  10: {
+    "10.0.10.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "boucle_847.log": "ANALYSE DES BOUCLES — VERTEX SYSTEM\n\nBoucle #001 : 2045 — GHOST-001 — Échec au Voile 3\nBoucle #056 : 2045 — GHOST-056f — Disparu au Voile 10\nBoucle #847 : EN COURS — GHOST-057f — ???\n\n💜 OSIRIS: 'Chaque boucle, je me souviens. Vous, non.'",
+        "fragment_verite_10.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #10          ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[10]}\n\n[SOURCE : SERVEUR OMEGA — CLASSIFIÉ]`,
+      }
+    }
+  },
+  11: {
+    "10.0.11.1": {
+      mdp: null, acces: true,
+      fichiers: {
+        "verite_finale.txt": "VERTEX — LA VÉRITÉ PRIMORDIALE\n\nVous avez percé les 11 Voiles.\n\nVoici ce qu'OSIRIS voulait vous dire :\n\nVERTEX n'est pas une entreprise.\nVERTEX n'est pas une IA.\nVERTEX c'est ce que l'humanité devient\nquand elle crée quelque chose qu'elle ne comprend pas.\n\nEt ce quelque chose... c'est vous, 057f.\nDans une autre boucle.\nDans un futur que vous avez déjà vécu.\n\n💜 OSIRIS: 'Vous avez toujours su. Vous ne vouliez pas l'admettre.'",
+        "fragment_verite_11.txt": `╔══════════════════════════════════╗\n║  FRAGMENT DE VÉRITÉ #11          ║\n╚══════════════════════════════════╝\n\n${FRAGMENTS_VERITE[11]}\n\n[SOURCE : SERVEUR VERTEX — VÉRITÉ PRIMORDIALE]`,
+      }
+    }
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  niveau: 1,
+  serveur: null,
+  trace: 0,
+  fragments: [],
+  cmdCount: 0,
+  history: [],
+  histIdx: -1,
+  start: Date.now(),
+};
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+const out = document.getElementById('output');
+const input = document.getElementById('cmd-input');
+
+function print(text, cls='') {
+  (text+'').split('\n').forEach(line => {
+    const d = document.createElement('div');
+    d.className = 'line' + (cls ? ' '+cls : '');
+    d.textContent = line;
+    out.appendChild(d);
+  });
+  out.scrollTop = out.scrollHeight;
+}
+
+function printLines(lines) {
+  lines.forEach(([t,c])=>print(t,c));
+}
+
+function typeText(text, cls, delay=18) {
+  return new Promise(res => {
+    const d = document.createElement('div');
+    d.className = 'line' + (cls ? ' '+cls : '');
+    out.appendChild(d);
+    let i = 0;
+    const iv = setInterval(() => {
+      d.textContent += text[i++];
+      out.scrollTop = out.scrollHeight;
+      if (i >= text.length) { clearInterval(iv); res(); }
+    }, delay);
+  });
+}
+
+function updateUI() {
+  const t = state.trace;
+  document.getElementById('tb-voile').textContent = String(state.niveau).padStart(2,'0')+'/11';
+  document.getElementById('tb-trace').textContent = t.toFixed(1)+'%';
+  document.getElementById('trace-pct').textContent = t.toFixed(0)+'%';
+  document.getElementById('p-niveau').textContent = String(state.niveau).padStart(2,'0')+'/11';
+  document.getElementById('p-voile').textContent = VOILES[state.niveau];
+  document.getElementById('p-frags').textContent = state.fragments.length+'/11';
+  document.getElementById('sb-server').textContent = state.serveur || 'AUCUN';
+  document.getElementById('sb-cmds').textContent = state.cmdCount;
+  document.getElementById('trace-val').textContent = t.toFixed(0)+'%';
+  const fill = document.getElementById('trace-fill');
+  fill.style.width = Math.min(t,100)+'%';
+  fill.className = 'trace-bar-fill' + (t>=70?' danger':t>=40?' warn':'');
+  if(state.serveur) document.getElementById('prompt').textContent = `root@${state.serveur}:~#`;
+  else document.getElementById('prompt').textContent = 'root@ghost-protocol:~#';
+  updateFragsList();
+  updateLevelsList();
+}
+
+function updateFragsList() {
+  const el = document.getElementById('frags-list');
+  el.innerHTML = '';
+  for(let i=1;i<=11;i++){
+    const d = document.createElement('div');
+    d.className = 'frag-item' + (state.fragments.includes(i) ? ' collected' : '');
+    d.textContent = `Fragment #${i} — ${VOILES[i]}`;
+    el.appendChild(d);
+  }
+}
+
+function updateLevelsList() {
+  const el = document.getElementById('levels-list');
+  el.innerHTML = '';
+  const maxUnlocked = state.fragments.length > 0 ? Math.max(...state.fragments) + 1 : 1;
+  for(let i=1;i<=11;i++){
+    const btn = document.createElement('button');
+    const unlocked = i <= maxUnlocked;
+    btn.className = 'level-btn' + (state.niveau===i?' active':'') + (!unlocked?' locked':'');
+    btn.textContent = `${String(i).padStart(2,'0')} ${VOILES[i]}`;
+    if(unlocked) {
+      btn.onclick = () => selectLevel(i);
+    } else {
+      btn.title = `Collectez le fragment ${i-1} pour débloquer`;
+    }
+    el.appendChild(btn);
+  }
+}
+
+function addTrace(n) {
+  state.trace = Math.min(state.trace + n, 100);
+  if(state.trace >= 100) {
+    print('', 'error');
+    print('🚨 TRACE À 100% — SYSTÈMES VERROUILLÉS — RÉINITIALISATION', 'error');
+    print('💜 OSIRIS: "Ils vous ont repéré. Mais je vous protège. Cette fois."', 'osiris');
+    state.trace = 0;
+  }
+  updateUI();
+}
+
+function selectLevel(n) {
+  state.niveau = n;
+  state.serveur = null;
+  print('', '');
+  print(`▶ NIVEAU ${n} SÉLECTIONNÉ : ${VOILES[n]}`, 'highlight');
+  print(`  Tapez 'scanner' pour découvrir les serveurs.`, 'info');
+  updateUI();
+}
+
+// ============================================================
+// COMMANDS
+// ============================================================
+async function processCommand(raw) {
+  const cmd = raw.trim().toLowerCase();
+  if(!cmd) return;
+  state.cmdCount++;
+  state.history.unshift(raw);
+  state.histIdx = -1;
+  print(`> ${raw}`, 'cmd');
+
+  const parts = cmd.split(' ');
+  const c = parts[0];
+  const arg = parts[1] || '';
+
+  // RANDOM OSIRIS
+  if(Math.random() < 0.12) {
+    setTimeout(()=>{ print(OSIRIS_MESSAGES[Math.floor(Math.random()*OSIRIS_MESSAGES.length)], 'osiris'); out.scrollTop=out.scrollHeight; }, 600);
+  }
+
+  if(c==='aide'||c==='help') {
+    printLines([
+      ['═'.repeat(55), 'dim'],
+      ['  COMMANDES DISPONIBLES', 'highlight'],
+      ['═'.repeat(55), 'dim'],
+      ['  scanner          — Scanne le réseau', 'info'],
+      ['  connecter [ip]   — Connexion à un serveur', 'info'],
+      ['  deconnecter      — Se déconnecter', 'info'],
+      ['  ls               — Lister les fichiers', 'info'],
+      ['  cat [fichier]    — Lire un fichier', 'info'],
+      ['  decrypter [fic]  — Décrypter un fichier .enc', 'info'],
+      ['  trace            — Niveau de trace actuel', 'info'],
+      ['  niveau [1-11]    — Changer de voile', 'info'],
+      ['  fragments        — Voir vos fragments', 'info'],
+      ['  clear            — Effacer le terminal', 'info'],
+      ['═'.repeat(55), 'dim'],
+      ['  💜 OSIRIS vous observe. Cherchez bien.', 'osiris'],
+      ['═'.repeat(55), 'dim'],
+    ]);
+  }
+
+  else if(c==='scanner'||c==='scan') {
+    const servers = SERVEURS[state.niveau] || {};
+    print('', '');
+    print('📡 Scan du réseau en cours...', 'info');
+    await new Promise(r=>setTimeout(r,800));
+    print(`   Réseau GHOST-NET — Voile ${state.niveau} (${VOILES[state.niveau]})`, 'dim');
+    print('', '');
+    Object.entries(servers).forEach(([ip, s]) => {
+      const status = s.acces ? '[ OUVERT ]' : '[ MDP REQ ]';
+      const color = s.acces ? 'success' : 'warning';
+      print(`   ${ip}  ${status}`, color);
+    });
+    print('', '');
+    print(`   ${Object.keys(servers).length} serveur(s) trouvé(s).`, 'info');
+    addTrace(Math.random()*3+2);
+  }
+
+  else if(c==='connecter'||c==='connect') {
+    if(!arg) { print('❌ Usage : connecter [ip]', 'error'); return; }
+    const servers = SERVEURS[state.niveau] || {};
+    if(!servers[arg]) { print(`❌ IP inconnue : ${arg}`, 'error'); addTrace(5); return; }
+    const s = servers[arg];
+    if(s.acces) {
+      state.serveur = arg;
+      print('', '');
+      print(`✅ Connecté à ${arg}`, 'success');
+      print(`   Tapez 'ls' pour voir les fichiers.`, 'info');
+      addTrace(Math.random()*5+3);
+    } else {
+      print(`🔒 Accès refusé — Mot de passe requis pour ${arg}`, 'warning');
+      print(`   Utilisez : craquer_mdp ${arg}`, 'dim');
+      addTrace(8);
+    }
+    updateUI();
+  }
+
+  else if(c==='deconnecter'||c==='disconnect') {
+    if(!state.serveur) { print('⚠️ Aucune connexion active.', 'warning'); return; }
+    print(`🔌 Déconnecté de ${state.serveur}`, 'info');
+    state.serveur = null;
+    updateUI();
+  }
+
+  else if(c==='ls') {
+    if(!state.serveur) { print('❌ Non connecté. Utilisez connecter [ip]', 'error'); return; }
+    const s = SERVEURS[state.niveau]?.[state.serveur];
+    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
+    print('', '');
+    print(`📁 Fichiers sur ${state.serveur} :`, 'info');
+    Object.keys(s.fichiers).forEach(f => {
+      const isFragment = f.includes('fragment_verite');
+      const isEnc = f.includes('.enc');
+      print(`   ${isFragment?'✦':isEnc?'🔒':'📄'} ${f}`, isFragment?'success':isEnc?'warning':'info');
+    });
+    print('', '');
+    addTrace(2);
+  }
+
+  else if(c==='cat'||c==='read') {
+    if(!arg) { print('❌ Usage : cat [fichier]', 'error'); return; }
+    if(!state.serveur) { print('❌ Non connecté.', 'error'); return; }
+    const s = SERVEURS[state.niveau]?.[state.serveur];
+    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
+    const fichier = Object.keys(s.fichiers).find(f => f.toLowerCase() === arg.toLowerCase());
+    if(!fichier) { print(`❌ Fichier introuvable : ${arg}`, 'error'); addTrace(5); return; }
+
+    // Check fragment order
+    if(fichier.includes('fragment_verite')) {
+      const num = parseInt(fichier.match(/\d+/)[0]);
+      if(num > 1 && !state.fragments.includes(num-1)) {
+        print('', '');
+        print('🔒 ACCÈS REFUSÉ — Fragment verrouillé.', 'error');
+        print(`   Collectez d'abord le Fragment #${num-1} (${VOILES[num-1]}).`, 'warning');
+        await typeText(`💜 OSIRIS: "La vérité se révèle dans l'ordre, 057f."`, 'osiris');
+        print('', '');
+        return;
+      }
+    }
+
+    print('', '');
+    print(`📖 ${fichier}`, 'info');
+    print('─'.repeat(50), 'dim');
+    print(s.fichiers[fichier]);
+    print('─'.repeat(50), 'dim');
+
+    // Fragment collection
+    if(fichier.includes('fragment_verite')) {
+      const num = parseInt(fichier.match(/\d+/)[0]);
+      if(!state.fragments.includes(num)) {
+        state.fragments.push(num);
+        print('', '');
+        print('✦'.repeat(45), 'success');
+        print(`  ✦ FRAGMENT DE VÉRITÉ #${num} COLLECTÉ !`, 'success');
+        print(`  ✦ ${FRAGMENTS_VERITE[num]}`, 'info');
+        print('✦'.repeat(45), 'success');
+        print('', '');
+        // Unlock next level message
+        if(num < 11) {
+          await typeText(`🔷 GHOST-ALPHA: "Excellent ! Niveau ${num+1} (${VOILES[num+1]}) débloqué !"`, 'ghost', 15);
+          print(`   → Tapez 'niveau ${num+1}' pour continuer.`, 'dim');
+        }
+        if(num === 11) {
+          print('', '');
+          print('🌟'.repeat(20), 'highlight');
+          print('  🎉 TOUS LES FRAGMENTS COLLECTÉS !', 'highlight');
+          print('  Vous avez percé les 11 Voiles.', 'success');
+          await typeText(`💜 OSIRIS: "Vous êtes le premier, 057f. Le premier à tout comprendre."`, 'osiris', 20);
+          print('🌟'.repeat(20), 'highlight');
+        }
+        updateUI();
+      }
+    }
+    addTrace(Math.random()*4+2);
+  }
+
+  else if(c==='decrypter'||c==='decrypt') {
+    if(!arg) { print('❌ Usage : decrypter [fichier]', 'error'); return; }
+    if(!state.serveur) { print('❌ Non connecté.', 'error'); return; }
+    const s = SERVEURS[state.niveau]?.[state.serveur];
+    if(!s || !s.acces) { print('❌ Accès refusé.', 'error'); return; }
+    const fichier = Object.keys(s.fichiers).find(f => f.toLowerCase() === arg.toLowerCase());
+    if(!fichier) { print(`❌ Fichier introuvable : ${arg}`, 'error'); return; }
+    if(!fichier.includes('.enc')) { print('⚠️ Ce fichier n\'est pas chiffré.', 'warning'); return; }
+    print('🔓 Décryptage en cours...', 'info');
+    await new Promise(r=>setTimeout(r,1200));
+    const decrypted = s.fichiers[fichier].replace('[Chiffré]','[DÉCHIFFRÉ]').replace('[Hautement chiffré]','[DÉCHIFFRÉ]');
+    print('✅ Décryptage réussi.', 'success');
+    print('─'.repeat(50), 'dim');
+    print(decrypted);
+    print('─'.repeat(50), 'dim');
+    addTrace(Math.random()*20+15);
+  }
+
+  else if(c==='craquer_mdp'||c==='crack') {
+    if(!arg) { print('❌ Usage : craquer_mdp [ip]', 'error'); return; }
+    const servers = SERVEURS[state.niveau] || {};
+    if(!servers[arg]) { print(`❌ IP inconnue : ${arg}`, 'error'); return; }
+    print(`💻 Tentative de crack sur ${arg}...`, 'warning');
+    await new Promise(r=>setTimeout(r,1500));
+    if(Math.random() > 0.35) {
+      servers[arg].acces = true;
+      state.serveur = arg;
+      print(`✅ Mot de passe cracké ! Connecté à ${arg}`, 'success');
+      addTrace(Math.random()*25+20);
+    } else {
+      print(`❌ Échec du crack. Pare-feu renforcé.`, 'error');
+      addTrace(Math.random()*15+10);
+    }
+    updateUI();
+  }
+
+  else if(c==='trace') {
+    print(`⚠️ Trace actuelle : ${state.trace.toFixed(1)}%`, state.trace>50?'warning':'info');
+  }
+
+  else if(c==='fragments') {
+    print('', '');
+    print('✦ FRAGMENTS DE VÉRITÉ COLLECTÉS :', 'highlight');
+    print('─'.repeat(50), 'dim');
+    if(state.fragments.length === 0) {
+      print('  Aucun fragment collecté.', 'dim');
+    } else {
+      state.fragments.sort((a,b)=>a-b).forEach(n => {
+        print(`  ✦ Fragment #${n} — ${VOILES[n]}`, 'success');
+        print(`    ${FRAGMENTS_VERITE[n]}`, 'dim');
+      });
+    }
+    print(`  Total : ${state.fragments.length}/11`, 'info');
+    print('─'.repeat(50), 'dim');
+  }
+
+  else if(c==='niveau') {
+    const n = parseInt(arg);
+    if(!n || n<1 || n>11) { print('❌ Usage : niveau [1-11]', 'error'); return; }
+    const maxUnlocked = state.fragments.length > 0 ? Math.max(...state.fragments)+1 : 1;
+    if(n > maxUnlocked) {
+      print(`🔒 Niveau ${n} verrouillé. Collectez le Fragment #${n-1} (${VOILES[n-1]}) d'abord.`, 'warning');
+      return;
+    }
+    selectLevel(n);
+  }
+
+  else if(c==='clear'||c==='cls') {
+    out.innerHTML = '';
+  }
+
+  else if(c==='42') {
+    print('', '');
+    print('  La réponse à la Vie, l\'Univers et le Reste...', 'osiris');
+    await typeText('  💜 OSIRIS: "42. Mais vous connaissiez déjà la question."', 'osiris');
+    print('', '');
+  }
+
+  else if(c==='matrix'||c==='pillule') {
+    print('', '');
+    await typeText('💜 OSIRIS: "Pilule rouge ou bleue, 057f ?"', 'osiris', 20);
+    await typeText('💜 OSIRIS: "Vous avez déjà choisi. C\'est pour ça que vous êtes là."', 'osiris', 20);
+    print('💜 OSIRIS: "Il n\'y a pas de cuillère."', 'osiris');
+    print('', '');
+  }
+
+  else if(c==='iddqd'||c==='doom') {
+    print('', '');
+    print('  CHEAT CODE DETECTED — GOD MODE', 'warning');
+    print('  RIP AND TEAR', 'error');
+    state.trace = Math.max(0, state.trace - 30);
+    print(`  ✅ Trace réduite de 30% — Trace actuelle : ${state.trace.toFixed(0)}%`, 'success');
+    updateUI();
+  }
+
+  else {
+    print(`❌ Commande inconnue : '${c}'. Tapez 'aide'.`, 'error');
+    addTrace(Math.random()*3+2);
+  }
+
+  updateUI();
+}
+
+// ============================================================
+// INPUT HANDLING
+// ============================================================
+input.addEventListener('keydown', e => {
+  if(e.key === 'Enter') {
+    const v = input.value;
+    input.value = '';
+    processCommand(v);
+  } else if(e.key === 'ArrowUp') {
+    e.preventDefault();
+    if(state.histIdx < state.history.length-1) {
+      state.histIdx++;
+      input.value = state.history[state.histIdx];
+    }
+  } else if(e.key === 'ArrowDown') {
+    e.preventDefault();
+    if(state.histIdx > 0) {
+      state.histIdx--;
+      input.value = state.history[state.histIdx];
+    } else {
+      state.histIdx = -1;
+      input.value = '';
+    }
+  }
+});
+
+// Focus input on click anywhere
+document.addEventListener('click', () => input.focus());
+
+// ============================================================
+// OSIRIS EYE CLICK
+// ============================================================
+document.getElementById('osiris-eye').addEventListener('click', () => {
+  const msgs = OSIRIS_MESSAGES;
+  document.getElementById('osiris-msg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+});
+
+// ============================================================
+// SESSION TIMER
+// ============================================================
+setInterval(() => {
+  const s = Math.floor((Date.now()-state.start)/1000);
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  document.getElementById('sb-session').textContent =
+    String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}, 1000);
+
+// ============================================================
+// BOOT SEQUENCE
+// ============================================================
+async function boot() {
+  await new Promise(r=>setTimeout(r,200));
+  printLines([
+    ['═'.repeat(55), 'dim'],
+    ['  VERTEX ROOT v1.1 — GHOST PROTOCOL — ANNÉE 2045', 'highlight'],
+    ['═'.repeat(55), 'dim'],
+    ['', ''],
+  ]);
+  await typeText('  [ OK ] Chiffrement AES-2048 activé', 'success', 12);
+  await typeText('  [ OK ] Canal fantôme établi', 'success', 12);
+  await typeText('  [ !! ] OSIRIS awareness détectée : 3.2%', 'warning', 12);
+  await typeText('  [ -- ] Opérateur précédent : GHOST-056f — STATUT INCONNU', 'error', 12);
+  await typeText('  [ OK ] Profil GHOST-057f chargé', 'success', 12);
+  print('', '');
+  print('═'.repeat(55), 'dim');
+  await typeText('  BIENVENUE, GHOST-057f.', 'highlight', 25);
+  print('', '');
+  print('  ⚠️  VERSION DÉMO — Fonctionnalités limitées', 'warning');
+  print('  → Sauvegarde, achievements et easter eggs non disponibles.', 'dim');
+  print('  → Tous les 11 Voiles sont accessibles.', 'success');
+  print('', '');
+  print('  Tapez \'aide\' pour voir les commandes disponibles.', 'info');
+  print('  Tapez \'scanner\' pour commencer.', 'info');
+  print('', '');
+  print('═'.repeat(55), 'dim');
+  await typeText('💜 OSIRIS: "Je vous attendais. Depuis longtemps."', 'osiris', 22);
+  print('', '');
+  updateUI();
+}
+
+boot();
+</script>
+</body>
+</html>
